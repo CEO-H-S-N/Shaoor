@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { BookOpen, CheckCircle2, RefreshCw } from "lucide-react";
 import styles from "./page.module.css";
 
-export default function VerifyPage() {
+function VerifyForm() {
   const router = useRouter();
   const params = useSearchParams();
   const email = params.get("email") || "";
@@ -210,5 +210,24 @@ export default function VerifyPage() {
         </Link>
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.page}>
+          <div className={styles.card} style={{ textAlign: "center", padding: "40px" }}>
+            <div className={styles.spinner} style={{ margin: "0 auto 16px" }} />
+            <p style={{ color: "var(--color-neutral-600)", fontSize: "var(--text-sm)" }}>
+              Loading verification...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <VerifyForm />
+    </Suspense>
   );
 }
