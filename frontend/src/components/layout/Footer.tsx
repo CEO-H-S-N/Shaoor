@@ -63,7 +63,11 @@ export function Footer() {
 
         {/* Bottom */}
         <div className={styles.footerBottom}>
-          <span>© {new Date().getFullYear()} Shaoor.org. All rights reserved.</span>
+          <div className={styles.footerCopyright}>
+            <span>© {new Date().getFullYear()} Shaoor.org. All rights reserved.</span>
+            <span className={styles.creditSeparator}>•</span>
+            <span className={styles.creditText}>Designed and developed by HSN</span>
+          </div>
           <div className={styles.footerSocial}>
             <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
               <XIcon size={18} />

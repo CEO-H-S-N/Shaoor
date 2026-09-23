@@ -86,6 +86,22 @@
   font-size: var(--text-xs);
 }
 
+.footerCopyright {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.creditSeparator {
+  color: var(--color-neutral-600);
+}
+
+.creditText {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
 .footerSocial {
   display: flex;
   gap: var(--space-4);
@@ -110,6 +126,12 @@
   .footerBottom {
     flex-direction: column;
     gap: var(--space-4);
+    text-align: center;
+    align-items: center;
+  }
+
+  .footerCopyright {
+    justify-content: center;
     text-align: center;
   }
 }
