@@ -77,7 +77,7 @@ This stores all users, papers, reviews, and categories.
 7. Under **Settings**:
    - DB instance identifier: `shaoor-db`
    - Master username: `postgres`
-   - Master password: Create a strong password (e.g., `ShaoorDbPass2026!`)
+   - Master password: Create a strong password (e.g., `YourStrongPasswordHere!`)
 8. Under **Instance configuration**, ensure `db.t3.micro` or `db.t4g.micro` is selected.
 9. Under **Storage**, disable "Enable storage autoscaling" to ensure you stay strictly within the 20GB free tier.
 10. Under **Connectivity**:
@@ -88,7 +88,7 @@ This stores all users, papers, reviews, and categories.
 13. Under the **Connectivity & security** tab, copy the **Endpoint**.
 14. Your connection string will look like this:
     `postgresql://[username]:[password]@[endpoint]:5432/postgres?schema=public`
-    *(Example: `postgresql://postgres:ShaoorDbPass2026!@shaoor-db.abcdefg.us-east-1.rds.amazonaws.com:5432/postgres?schema=public`)*
+    *(Example: `postgresql://postgres:YourStrongPasswordHere!@shaoor-db.abcdefg.us-east-1.rds.amazonaws.com:5432/postgres?schema=public`)*
 
 > [!CAUTION]
 > By default, the security group might block your IP. Click the security group link under "Connectivity & security", edit the Inbound Rules, and add a rule for PostgreSQL (Port 5432) allowing source `0.0.0.0/0` (for testing/Vercel) or just your specific IP.
