@@ -1,21 +1,38 @@
-MIT License
+Proprietary & Royalty-Based Software License Agreement
+Copyright (c) 2026 Hassan Tariq. All rights reserved.
 
-Copyright (c) 2026 Hassan Tariq
+1. Ownership & Exclusive Rights
+This software, including its source code, object code, documentation, architecture, user interface design, visual elements, graphics, algorithms, database schemas, and associated material (collectively, the "Software"), is the sole and exclusive intellectual property of Hassan Tariq. No rights, titles, or interests in or to the Software are transferred to any party except as expressly set forth herein.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+2. Absolute Grant Restrictions
+Unless explicitly authorized under a separate, signed Commercial Royalty Agreement executed by the Licensor, you shall NOT, directly or indirectly:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Copy, Distribute, or Sublicense: Reproduce, modify, translate, adapt, merge, publish, distribute, transfer, lease, loan, rent, or sublicense the Software or any portion thereof.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Reverse Engineer: Reverse engineer, decompile, disassemble, trace, or attempt to derive the source code, underlying ideas, trade secrets, or structure of the Software.
+
+Derivative Works: Create derivative works, modifications, extensions, wrappers, API integrations, or adaptations based on the Software or any portion thereof.
+
+SaaS / Cloud Exploitation: Offer, host, or expose the Software (or its output) as a managed service, Software-as-a-Service (SaaS), Platform-as-a-Service (PaaS), application service provider (ASP), or through any network access mechanism.
+
+AI & Machine Learning Training: Use the Software, its source code, generated outputs, or documentation to train, fine-tune, validate, test, or evaluate any artificial intelligence, machine learning model, large language model (LLM), or automated system.
+
+3. Mandatory Licensing & Royalty Obligations
+Commercial & Non-Commercial Use: Any use, deployment, execution, embedding, or distribution of the Software—whether for commercial, non-commercial, personal, academic, or evaluation purposes—requires a prior, written Royalty Agreement signed by the Licensor.
+
+Royalty Terms: Authorized licensees must strictly adhere to the payment schedules, calculation metrics, and reporting requirements specified in their custom Royalty Agreement.
+
+Audit Rights: Licensor reserves the right, upon reasonable written notice, to audit (or hire an independent third-party auditor to audit) any licensee's systems, deployment records, and financials to verify compliance with royalty obligations and scope of use.
+
+4. Remedies, Damages & Legal Costs
+Injunctive Relief: You acknowledge that unauthorized use, copying, or distribution of the Software causes irreparable damage to the Licensor for which monetary damages alone are inadequate. Therefore, in the event of a breach, Licensor shall be entitled to immediate injunctive relief without the necessity of posting a bond.
+
+Statutory & Direct Damages: Unauthorized use of this Software renders the user liable for statutory damages, disgorgement of all revenues/profits derived from such use, and damages equal to 3× standard custom royalty rates.
+
+Legal Fees: In any action or proceeding to enforce rights under this Agreement, the prevailing party shall be entitled to recover its reasonable attorneys' fees, court costs, and enforcement expenses.
+
+5. Governing Law & Jurisdiction
+This Agreement shall be governed by, construed, and enforced in accordance with the laws of [Your State/Country, e.g., Delaware, USA], without regard to its conflict of law principles. Any legal action or proceeding arising under this Agreement shall be brought exclusively in the courts located within [Your County/City and State/Country].
+
+6. Disclaimer of Warranty & Limitation of Liability
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. IN NO EVENT SHALL THE LICENSOR BE LIABLE FOR ANY CLAIM, DIRECT OR CONSEQUENTIAL DAMAGES, OR OTHER LIABILITY ARISING FROM OR IN CONNECTION WITH THE SOFTWARE.
