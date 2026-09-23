@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     const result = streamText({
-      model: google("gemini-1.5-flash"),
+      model: google("gemini-3.6-flash"),
       system:
         "You are the Shaoor Academic Assistant, an AI expert helping researchers, authors, and peer reviewers on the Shaoor Open Access Academic Review Platform. Provide concise, high-quality, academic guidance on paper structure, peer-review feedback, methodology, and citations.",
       messages,

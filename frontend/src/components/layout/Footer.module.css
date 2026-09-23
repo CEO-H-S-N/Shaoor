@@ -36,23 +36,11 @@
   gap: var(--space-3);
 }
 
-.footerLogoIcon {
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-accent-500));
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: var(--text-lg);
-  font-weight: var(--weight-extrabold);
-}
-
-.footerLogoText {
-  font-size: var(--text-xl);
-  font-weight: var(--weight-bold);
-  color: white;
+.footerLogoImg {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
 }
 
 .footerDescription {

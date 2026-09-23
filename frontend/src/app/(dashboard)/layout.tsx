@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-import { AIPanel } from "@/components/layout/AIPanel";
+import { AIChatPopup } from "@/components/layout/AIChatPopup";
 import styles from "./layout.module.css";
 
 export default async function DashboardLayout({
@@ -28,9 +28,10 @@ export default async function DashboardLayout({
         <main className={styles.main} id="main-content">
           {children}
         </main>
-
-        <AIPanel />
       </div>
+
+      {/* Floating AI chat popup — available on all dashboard pages */}
+      <AIChatPopup />
     </div>
   );
 }

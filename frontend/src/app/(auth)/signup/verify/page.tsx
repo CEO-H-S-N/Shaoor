@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BookOpen, CheckCircle2, RefreshCw } from "lucide-react";
+import { CheckCircle2, RefreshCw } from "lucide-react";
 import styles from "./page.module.css";
 
 function VerifyForm() {
@@ -139,12 +140,16 @@ function VerifyForm() {
     <div className={styles.page}>
       <div className={styles.card}>
         {/* Logo */}
-        <div className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <BookOpen size={24} />
-          </div>
-          <span className={styles.logoText}>Shaoor</span>
-        </div>
+        <Link href="/" className={styles.logoLink} aria-label="Shaoor Home">
+          <Image
+            src="/shaoor-logo.png"
+            alt="Shaoor"
+            width={120}
+            height={92}
+            className={styles.logoImage}
+            priority
+          />
+        </Link>
 
         <h1 className={styles.title}>Check your email</h1>
         <p className={styles.subtitle}>

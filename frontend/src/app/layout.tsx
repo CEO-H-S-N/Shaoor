@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
+import { SplashProvider } from "@/lib/splash-context";
+import { SplashOnMount } from "@/components/layout/SplashOnMount";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -51,7 +53,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SessionProvider>{children}</SessionProvider>
+        <SplashProvider>
+          <SplashOnMount />
+          <SessionProvider>{children}</SessionProvider>
+        </SplashProvider>
       </body>
     </html>
   );

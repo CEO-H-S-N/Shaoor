@@ -8,7 +8,6 @@ import styles from "./page.module.css";
 
 export function LoginButtons() {
   const [loading, setLoading] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,7 +21,11 @@ export function LoginButtons() {
     }
   }
 
-  async function handleCredentialsSignIn(e?: React.FormEvent, directEmail?: string, directPassword?: string) {
+  async function handleCredentialsSignIn(
+    e?: React.FormEvent,
+    directEmail?: string,
+    directPassword?: string
+  ) {
     if (e) e.preventDefault();
     const activeEmail = (directEmail || email).trim().toLowerCase();
     const activePassword = directPassword || password;
@@ -65,112 +68,95 @@ export function LoginButtons() {
 
   return (
     <div className={styles.oauthSection}>
-      {/* ─── Credentials Sign In ────────────────────────── */}
-      <form onSubmit={handleCredentialsSignIn} className={styles.credentialsForm}>
+      {/* ─── Email / Password Form ───────────────────── */}
+      <form onSubmit={handleCredentialsSignIn} className={styles.credentialsForm} noValidate>
         <input
+          id="login-email"
           type="email"
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={styles.loginInput}
+          autoComplete="email"
           required
         />
         <input
+          id="login-password"
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={styles.loginInput}
+          autoComplete="current-password"
           required
         />
-        {error && <div className={styles.loginError}>{error}</div>}
+
+        {error && (
+          <div className={styles.loginError} role="alert">
+            {error}
+          </div>
+        )}
+
         <button
+          id="login-submit"
           type="submit"
           className={styles.loginSubmitBtn}
           disabled={loading}
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {loading ? "Signing in…" : "Sign in"}
         </button>
 
-        {/* ─── Dev Test Quick Access Chips ────────────────── */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "8px",
-          marginTop: "10px",
-          padding: "8px 12px",
-          background: "#f4f4f5",
-          borderRadius: "8px",
-          fontSize: "12px",
-          color: "#52525b"
-        }}>
-          <span style={{ fontWeight: 600 }}>Test Quick-Fill:</span>
+        {/* Dev quick-fill */}
+        <div className={styles.quickFillRow}>
+          <span style={{ fontWeight: 600 }}>Dev test:</span>
           <button
             type="button"
+            className={styles.quickFillBtn}
             onClick={() => fillAndSubmit("devuser@shaoor.org", "dev123")}
             disabled={loading}
-            style={{
-              padding: "4px 8px",
-              background: "#ffffff",
-              border: "1px solid #d4d4d8",
-              borderRadius: "6px",
-              fontSize: "11px",
-              fontWeight: 600,
-              color: "#09090b",
-              cursor: "pointer"
-            }}
           >
             👤 User
           </button>
           <button
             type="button"
+            className={styles.quickFillBtn}
             onClick={() => fillAndSubmit("devadmin@shaoor.org", "dev123")}
             disabled={loading}
-            style={{
-              padding: "4px 8px",
-              background: "#ffffff",
-              border: "1px solid #d4d4d8",
-              borderRadius: "6px",
-              fontSize: "11px",
-              fontWeight: 600,
-              color: "#09090b",
-              cursor: "pointer"
-            }}
           >
             🛡️ Admin
           </button>
         </div>
       </form>
 
-      {/* ─── Divider ────────────────────────────────────── */}
+      {/* ─── Divider ─────────────────────────────────── */}
       <div className={styles.divider}>or</div>
 
-      {/* ─── Sign up with email ─────────────────────────── */}
+      {/* ─── Create account ──────────────────────────── */}
       <Link href="/signup" className={styles.signUpBtn} id="login-signup-email">
-        <UserPlus size={18} />
-        Sign up with email
+        <UserPlus size={16} />
+        Create an account
       </Link>
 
-      {/* ─── Divider ────────────────────────────────────── */}
-      <div className={styles.divider}>or sign in with</div>
+      {/* ─── Divider ─────────────────────────────────── */}
+      <div className={styles.divider}>or continue with</div>
 
-      {/* ─── Google OAuth ────────────────────────────────── */}
+      {/* ─── Google OAuth ─────────────────────────────── */}
       <button
         id="login-google"
         className={`${styles.oauthBtn} ${styles.oauthBtnGoogle}`}
         onClick={handleGoogleSignIn}
         disabled={loading}
         aria-label="Sign in with Google"
+        type="button"
       >
         {loading ? (
           <span
             style={{
               display: "inline-block",
-              width: 20,
-              height: 20,
-              border: "2px solid #e0e0e0",
-              borderTop: "2px solid #4285f4",
+              width: 16,
+              height: 16,
+              border: "2px solid #cbd5e1",
+              borderTop: "2px solid #2563eb",
               borderRadius: "50%",
               animation: "spin 0.6s linear infinite",
             }}
@@ -183,7 +169,7 @@ export function LoginButtons() {
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
         )}
-        {loading ? "Signing in…" : "Continue with Google"}
+        Continue with Google
       </button>
     </div>
   );

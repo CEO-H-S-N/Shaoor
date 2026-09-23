@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import { BookOpen, GitBranch, X as XIcon, Mail } from "lucide-react";
+import Image from "next/image";
+import { GitBranch, X as XIcon, Mail } from "lucide-react";
 import styles from "./Footer.module.css";
 
 export function Footer() {
@@ -11,10 +12,13 @@ export function Footer() {
           {/* Brand */}
           <div className={styles.footerBrand}>
             <div className={styles.footerLogo}>
-              <div className={styles.footerLogoIcon}>
-                <BookOpen size={18} />
-              </div>
-              <span className={styles.footerLogoText}>Shaoor</span>
+              <Image
+                src="/shaoor-logo.png"
+                alt="Shaoor"
+                width={100}
+                height={77}
+                className={styles.footerLogoImg}
+              />
             </div>
             <p className={styles.footerDescription}>
               An open-access academic paper review and publication platform.
