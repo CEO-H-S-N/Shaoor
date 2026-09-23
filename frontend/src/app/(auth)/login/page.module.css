@@ -1,0 +1,382 @@
+/* ═══════════════════════════════════════════════════════════════
+   Login Page Styles
+   Split-screen: decorative left panel + auth form right
+   ═══════════════════════════════════════════════════════════════ */
+
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ─── Left Panel (Decorative) ─────────────────────────────── */
+.leftPanel {
+  background: linear-gradient(
+    150deg,
+    #18181b 0%,
+    #27272a 50%,
+    #3f3f46 100%
+  );
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  overflow: hidden;
+}
+
+.leftPattern {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.05) 0%, transparent 60%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.leftContent {
+  position: relative;
+  z-index: 1;
+  color: white;
+  text-align: center;
+  max-width: 380px;
+}
+
+.leftLogo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-10);
+}
+
+.leftLogoIcon {
+  width: 52px;
+  height: 52px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  backdrop-filter: blur(8px);
+}
+
+.leftLogoText {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: white;
+}
+
+.leftTitle {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-extrabold);
+  color: white;
+  margin-bottom: var(--space-4);
+  line-height: 1.2;
+}
+
+.leftDescription {
+  font-size: var(--text-base);
+  color: rgba(255, 255, 255, 0.75);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-10);
+}
+
+.leftStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  text-align: left;
+}
+
+.leftStat {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  backdrop-filter: blur(8px);
+}
+
+.leftStatNumber {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-extrabold);
+  color: white;
+}
+
+.leftStatLabel {
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: var(--space-1);
+}
+
+/* ─── Right Panel (Auth Form) ─────────────────────────────── */
+.rightPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12);
+  background: var(--color-neutral-0);
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 400px;
+}
+
+.formHeader {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.formTitle {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: #09090b;
+  margin-bottom: var(--space-2);
+}
+
+.formSubtitle {
+  font-size: var(--text-sm);
+  color: #52525b;
+}
+
+/* ─── OAuth Buttons ───────────────────────────────────────── */
+.oauthSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+}
+
+/* ─── Credentials Sign In Form ────────────────────────────── */
+.credentialsForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.loginInput {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px solid #d4d4d8;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  color: #09090b;
+  background: #ffffff;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.loginInput::placeholder {
+  color: #71717a;
+}
+
+.loginInput:focus {
+  border-color: #09090b;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.08);
+}
+
+.loginError {
+  font-size: var(--text-sm);
+  color: #dc2626;
+  background: #fef2f2;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid #fecaca;
+  text-align: center;
+}
+
+.loginSubmitBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: #18181b;
+  color: white;
+  border: none;
+  font-family: var(--font-sans);
+}
+
+.loginSubmitBtn:hover {
+  background: #27272a;
+}
+
+.loginSubmitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  background: #18181b;
+}
+
+/* ─── Sign Up with Email Button ────────────────────────────── */
+.signUpBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  background: #18181b;
+  color: white;
+  border: none;
+  text-decoration: none;
+  font-family: var(--font-sans);
+}
+
+.signUpBtn:hover {
+  background: #27272a;
+  text-decoration: none;
+  color: white;
+}
+
+.oauthBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: 2px solid var(--color-neutral-200);
+  background: var(--color-neutral-0);
+  color: var(--color-neutral-800);
+  font-family: var(--font-sans);
+}
+
+.oauthBtn:hover {
+  border-color: var(--color-neutral-300);
+  background: var(--color-neutral-50);
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.oauthBtn:active {
+  transform: translateY(0);
+}
+
+.oauthBtnGoogle {
+  border-color: #dadce0;
+}
+
+.oauthBtnGoogle:hover {
+  border-color: #4285f4;
+  background: #f8f9ff;
+}
+
+.oauthBtnOrcid {
+  border-color: #a6ce39;
+}
+
+.oauthBtnOrcid:hover {
+  border-color: #a6ce39;
+  background: #f9fde8;
+}
+
+.oauthIcon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ─── Divider ─────────────────────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: var(--space-6) 0;
+  color: var(--color-neutral-400);
+  font-size: var(--text-xs);
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-neutral-200);
+}
+
+/* ─── Terms & Privacy ─────────────────────────────────────── */
+.terms {
+  font-size: var(--text-xs);
+  color: var(--color-neutral-400);
+  text-align: center;
+  line-height: var(--leading-relaxed);
+  margin-top: var(--space-6);
+}
+
+.terms a {
+  color: var(--color-accent-500);
+}
+
+.terms a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Back Link ───────────────────────────────────────────── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-neutral-500);
+  margin-bottom: var(--space-8);
+  transition: color var(--transition-fast);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  color: var(--color-neutral-800);
+  text-decoration: none;
+}
+
+/* ─── What is ORCID info box ──────────────────────────────── */
+.infoBox {
+  background: var(--color-neutral-50);
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  font-size: var(--text-xs);
+  color: var(--color-neutral-600);
+  line-height: var(--leading-relaxed);
+}
+
+.infoBox strong {
+  color: var(--color-neutral-800);
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .leftPanel {
+    display: none;
+  }
+
+  .rightPanel {
+    padding: var(--space-8) var(--space-4);
+    min-height: 100vh;
+    justify-content: flex-start;
+    padding-top: var(--space-12);
+  }
+}

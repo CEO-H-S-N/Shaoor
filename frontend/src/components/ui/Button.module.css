@@ -1,0 +1,166 @@
+/* ═══════════════════════════════════════════════════════════════
+   Button Component Styles
+   Variants: primary, secondary, ghost, danger, outline
+   Sizes: sm, md, lg
+   ═══════════════════════════════════════════════════════════════ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Ripple effect */
+.button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 10%);
+  transform: scale(10);
+  opacity: 0;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.button:active::after {
+  transform: scale(0);
+  opacity: 1;
+  transition: 0s;
+}
+
+/* ─── Sizes ───────────────────────────────────────────────── */
+.sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  padding: var(--space-2) var(--space-5);
+  font-size: var(--text-base);
+}
+
+.lg {
+  padding: var(--space-3) var(--space-8);
+  font-size: var(--text-lg);
+  border-radius: var(--radius-xl);
+}
+
+/* ─── Variants ────────────────────────────────────────────── */
+.primary {
+  background: linear-gradient(135deg, #27272a, #18181b);
+  color: white;
+  box-shadow: var(--shadow-md);
+}
+
+.primary:hover {
+  background: linear-gradient(135deg, #3f3f46, #27272a);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.secondary {
+  background: var(--color-neutral-0);
+  color: var(--color-neutral-800);
+  border-color: var(--color-neutral-200);
+  box-shadow: var(--shadow-xs);
+}
+
+.secondary:hover {
+  background: var(--color-neutral-50);
+  border-color: var(--color-neutral-300);
+  box-shadow: var(--shadow-sm);
+}
+
+.ghost {
+  background: transparent;
+  color: var(--color-neutral-700);
+}
+
+.ghost:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+}
+
+.danger {
+  background: var(--color-error-500);
+  color: white;
+}
+
+.danger:hover {
+  background: var(--color-error-600);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.outline {
+  background: transparent;
+  color: var(--color-neutral-800);
+  border-color: var(--color-neutral-400);
+}
+
+.outline:hover {
+  background: var(--color-neutral-100);
+  color: var(--color-neutral-900);
+  border-color: var(--color-neutral-600);
+}
+
+/* ─── States ──────────────────────────────────────────────── */
+.loading {
+  color: transparent;
+}
+
+.spinner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+/* ─── Icon Button ─────────────────────────────────────────── */
+.iconOnly {
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+
+.iconOnly.sm {
+  padding: var(--space-1);
+}
+
+.iconOnly.lg {
+  padding: var(--space-3);
+}

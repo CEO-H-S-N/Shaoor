@@ -1,0 +1,241 @@
+// Shaoor.org — Prisma Schema
+// PostgreSQL on AWS RDS (Free Tier: db.t3.micro, 20GB)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth.js Models ──────────────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── Core Domain Models ──────────────────────────────────────
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
+  DESIGNER
+
+  @@map("user_role")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  role          UserRole  @default(CUSTOMER)
+  orcidId       String?   @unique @map("orcid_id")
+  affiliation   String?
+  bio           String?   @db.Text
+  isActive      Boolean   @default(true) @map("is_active")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  papers        Paper[]        @relation("AuthorPapers")
+  reviews       Review[]       @relation("ReviewerReviews")
+  notifications Notification[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+}
+
+enum PaperStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  REVISION_REQUESTED
+  ACCEPTED
+  PUBLISHED
+  REJECTED
+
+  @@map("paper_status")
+}
+
+model Paper {
+  id          String      @id @default(cuid())
+  title       String
+  abstract    String      @db.Text
+  status      PaperStatus @default(DRAFT)
+  categoryId  String?     @map("category_id")
+  keywords    String[]
+  fileUrl     String?     @map("file_url")
+  fileName    String?     @map("file_name")
+  fileSize    Int?        @map("file_size")
+  version     Int         @default(1)
+  authorId    String      @map("author_id")
+  submittedAt DateTime?   @map("submitted_at")
+  publishedAt DateTime?   @map("published_at")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  author   User           @relation("AuthorPapers", fields: [authorId], references: [id])
+  category Category?      @relation(fields: [categoryId], references: [id])
+  reviews  Review[]
+  versions PaperVersion[]
+
+  @@index([authorId])
+  @@index([status])
+  @@index([categoryId])
+  @@index([createdAt(sort: Desc)])
+  @@map("papers")
+}
+
+model PaperVersion {
+  id            String   @id @default(cuid())
+  paperId       String   @map("paper_id")
+  versionNumber Int      @map("version_number")
+  fileUrl       String   @map("file_url")
+  fileName      String   @map("file_name")
+  fileSize      Int?     @map("file_size")
+  changeNotes   String?  @db.Text @map("change_notes")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@unique([paperId, versionNumber])
+  @@map("paper_versions")
+}
+
+enum ReviewDecision {
+  ACCEPT
+  REJECT
+  REVISE
+
+  @@map("review_decision")
+}
+
+model Review {
+  id           String          @id @default(cuid())
+  paperId      String          @map("paper_id")
+  reviewerId   String          @map("reviewer_id")
+  comments     String?         @db.Text
+  privateNotes String?         @db.Text @map("private_notes")
+  decision     ReviewDecision?
+  score        Int?
+  isComplete   Boolean         @default(false) @map("is_complete")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+
+  paper    Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  reviewer User  @relation("ReviewerReviews", fields: [reviewerId], references: [id])
+
+  @@unique([paperId, reviewerId])
+  @@index([paperId])
+  @@index([reviewerId])
+  @@map("reviews")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  color       String?  @default("#0052cc")
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  papers Paper[]
+
+  @@map("categories")
+}
+
+enum NotificationType {
+  PAPER_SUBMITTED
+  PAPER_UNDER_REVIEW
+  REVIEW_COMPLETE
+  REVISION_REQUESTED
+  PAPER_ACCEPTED
+  PAPER_REJECTED
+  PAPER_PUBLISHED
+  REVIEWER_ASSIGNED
+  GENERAL
+
+  @@map("notification_type")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String           @map("user_id")
+  type      NotificationType
+  title     String
+  message   String           @db.Text
+  read      Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  userId       String?  @map("user_id")
+  action       String
+  resourceType String   @map("resource_type")
+  resourceId   String?  @map("resource_id")
+  details      Json?
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@map("audit_logs")
+}

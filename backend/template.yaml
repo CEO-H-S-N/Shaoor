@@ -1,0 +1,129 @@
+# Shaoor.org — AWS SAM Template
+# Deploys: Lambda + API Gateway + S3 (paper storage)
+# RDS must be provisioned separately (console or CDK) due to VPC complexity in SAM
+
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Shaoor.org Academic Paper Review Platform Backend
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 512
+    Runtime: nodejs20.x
+    Environment:
+      Variables:
+        NODE_ENV: production
+        DATABASE_URL: !Ref DatabaseUrl
+        JWT_SECRET: !Ref JwtSecret
+        FRONTEND_URL: !Ref FrontendUrl
+        S3_BUCKET: !Ref PaperStorageBucket
+        AWS_REGION_CUSTOM: !Ref AWS::Region
+
+Parameters:
+  DatabaseUrl:
+    Type: String
+    Description: PostgreSQL connection string
+    NoEcho: true
+  JwtSecret:
+    Type: String
+    Description: JWT signing secret (must match NEXTAUTH_SECRET)
+    NoEcho: true
+  FrontendUrl:
+    Type: String
+    Description: Frontend URL for CORS
+    Default: https://shaoor.org
+  StageName:
+    Type: String
+    Default: prod
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+
+Resources:
+  # ─── API Gateway ──────────────────────────────────────────
+  ShaoorApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref StageName
+      Cors:
+        AllowMethods: "'GET,POST,PUT,PATCH,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: !Sub "'${FrontendUrl}'"
+        AllowCredentials: true
+        MaxAge: "'86400'"
+      # Throttling: 10 requests/sec burst, 5 sustained
+      MethodSettings:
+        - HttpMethod: '*'
+          ResourcePath: '/*'
+          ThrottlingBurstLimit: 10
+          ThrottlingRateLimit: 5
+
+  # ─── Lambda Function ─────────────────────────────────────
+  ShaoorBackendFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/lambda.handler
+      CodeUri: .
+      Description: Shaoor.org Backend API
+      Policies:
+        - S3CrudPolicy:
+            BucketName: !Ref PaperStorageBucket
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource: '*'
+      Events:
+        ProxyApiRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ShaoorApi
+            Path: /
+            Method: ANY
+        ProxyApiGreedy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ShaoorApi
+            Path: /{proxy+}
+            Method: ANY
+
+  # ─── S3 Bucket for Paper Storage ─────────────────────────
+  PaperStorageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub 'shaoor-papers-${AWS::AccountId}'
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders: ['*']
+            AllowedMethods: ['PUT', 'GET']
+            AllowedOrigins:
+              - !Ref FrontendUrl
+            MaxAge: 3600
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteIncompleteUploads
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+      VersioningConfiguration:
+        Status: Enabled
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ShaoorApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}'
+  BucketName:
+    Description: S3 bucket for paper storage
+    Value: !Ref PaperStorageBucket

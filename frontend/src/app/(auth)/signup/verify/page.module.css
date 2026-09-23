@@ -1,0 +1,284 @@
+/* ═══════════════════════════════════════════════════════════════
+   OTP Verification Page
+   ═══════════════════════════════════════════════════════════════ */
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  padding: var(--space-6);
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-10) var(--space-10);
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+/* ─── Logo ────────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.logoIcon {
+  width: 44px;
+  height: 44px;
+  background: #18181b;
+  border-radius: var(--radius-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logoText {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: #09090b;
+}
+
+/* ─── Copy ────────────────────────────────────────────────── */
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: #09090b;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: #52525b;
+  margin: 0;
+}
+
+.email {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: #09090b;
+  background: #f4f4f5;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  margin-top: calc(-1 * var(--space-2));
+}
+
+/* ─── Form ────────────────────────────────────────────────── */
+.form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+/* ─── OTP Inputs ──────────────────────────────────────────── */
+.otpRow {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.otpInput {
+  width: 50px;
+  height: 58px;
+  text-align: center;
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-sans);
+  border: 2px solid #d4d4d8;
+  border-radius: var(--radius-lg);
+  background: #ffffff;
+  color: #09090b;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  caret-color: transparent;
+}
+
+.otpInput:focus {
+  border-color: #09090b;
+  box-shadow: 0 0 0 3px rgba(9, 9, 11, 0.08);
+}
+
+.otpInputFilled {
+  border-color: #09090b;
+  background: #fafafa;
+  color: #09090b;
+}
+
+/* ─── Error ───────────────────────────────────────────────── */
+.errorBox {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: #dc2626;
+  width: 100%;
+}
+
+/* ─── Verify Button ───────────────────────────────────────── */
+.verifyBtn {
+  width: 100%;
+  padding: var(--space-3) var(--space-4);
+  background: #18181b;
+  color: white;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.verifyBtn:hover:not(:disabled) {
+  background: #27272a;
+}
+
+.verifyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Resend ──────────────────────────────────────────────── */
+.resendRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.resendText {
+  font-size: var(--text-sm);
+  color: var(--color-neutral-500);
+}
+
+.resendBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-neutral-800);
+  padding: 0;
+  transition: color var(--transition-fast);
+  font-family: var(--font-sans);
+}
+
+.resendBtn:hover:not(:disabled) {
+  color: var(--color-neutral-950);
+  text-decoration: underline;
+}
+
+.resendBtn:disabled {
+  color: var(--color-neutral-400);
+  cursor: not-allowed;
+}
+
+.spinIcon {
+  animation: spin 1s linear infinite;
+}
+
+/* ─── Back Link ───────────────────────────────────────────── */
+.backLink {
+  font-size: var(--text-xs);
+  color: var(--color-neutral-400);
+  text-decoration: none;
+  margin-top: var(--space-2);
+}
+
+.backLink:hover {
+  color: var(--color-neutral-700);
+  text-decoration: underline;
+}
+
+/* ─── Success Screen ──────────────────────────────────────── */
+.successPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  padding: var(--space-6);
+}
+
+.successCard {
+  background: #ffffff;
+  border: 1px solid var(--color-neutral-200);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-12) var(--space-10);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.successIcon {
+  color: #16a34a;
+}
+
+.successTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-neutral-900);
+}
+
+.successText {
+  font-size: var(--text-sm);
+  color: var(--color-neutral-500);
+}
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .card {
+    padding: var(--space-8) var(--space-5);
+  }
+
+  .otpInput {
+    width: 44px;
+    height: 52px;
+    font-size: var(--text-xl);
+  }
+
+  .otpRow {
+    gap: var(--space-2);
+  }
+}
