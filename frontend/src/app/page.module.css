@@ -27,6 +27,20 @@
   overflow: hidden;
 }
 
+/* Subtle horizontal scrim on left side for crisp white text contrast without fading the landscape */
+.heroBackdrop {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.52) 0%,
+    rgba(15, 23, 42, 0.35) 40%,
+    rgba(15, 23, 42, 0.12) 65%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
 .heroContainer {
   max-width: 1240px;
   width: 100%;
@@ -50,51 +64,51 @@
   align-items: center;
   gap: 8px;
   padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid #bfdbfe;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 4px;
-  color: #1e3a8a;
+  color: #ffffff;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   width: fit-content;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .heroBadgeDot {
   width: 7px;
   height: 7px;
-  background: #2563eb;
+  background: #60a5fa;
   border-radius: 50%;
-  box-shadow: 0 0 6px rgba(37, 99, 235, 0.6);
+  box-shadow: 0 0 8px rgba(96, 165, 250, 0.8);
 }
 
 .heroTitle {
   font-size: clamp(2.2rem, 3.8vw, 3.25rem);
   font-weight: 800;
-  color: #0f172a;
+  color: #ffffff;
   line-height: 1.18;
   letter-spacing: -0.025em;
   margin: 0;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
 .heroTitleAccent {
-  color: #1e3a8a;
+  color: #93c5fd;
   display: block;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
 }
 
 .heroDescription {
   font-size: 1.0625rem;
-  color: #1e293b;
-  font-weight: 500;
-  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 400;
+  line-height: 1.65;
   margin: 0;
   max-width: 680px;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* ─── Flat White Line Divider (No Fade) ───────────────────── */

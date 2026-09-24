@@ -83,6 +83,7 @@ export default async function HomePage() {
       <main id="main-content">
         {/* ─── Hero Section with Nature Background at Top (No Card, No Overlay) ─── */}
         <section className={styles.hero}>
+          <div className={styles.heroBackdrop} />
           <div className={styles.heroContainer}>
             <div className={styles.heroTextOnly}>
               <div className={styles.heroBadge}>
