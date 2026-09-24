@@ -1,350 +1,359 @@
 import Link from "next/link";
 import {
   FileText,
-  Shield,
-  Zap,
-  Users,
-  BookOpen,
   Search,
   ArrowRight,
-  Sparkles,
   Eye,
-  Calendar,
+  ShieldCheck,
+  Zap,
+  Globe2,
+  TrendingUp,
+  Clock,
+  Send,
+  Sparkles,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { prisma } from "@/lib/prisma";
 import styles from "./page.module.css";
 
-// Sample data for demo — will be replaced with real API data
-const samplePapers = [
-  {
-    id: "1",
-    title: "Machine Learning Approaches for Early Detection of Neurodegenerative Diseases",
-    abstract: "This paper presents a novel approach using deep learning models to identify early biomarkers of Alzheimer's and Parkinson's disease from routine clinical data...",
-    author: "Dr. Sarah Chen",
-    authorInitials: "SC",
-    category: "Health & Medicine",
-    categoryColor: "#00695c",
-    date: "Sep 15, 2026",
-    views: 1240,
-  },
-  {
-    id: "2",
-    title: "The Digital Divide in Rural Education: A Comprehensive Policy Analysis",
-    abstract: "Examining how socioeconomic disparities in access to digital technology impact educational outcomes in rural communities across South Asia...",
-    author: "Prof. Ahmed Khan",
-    authorInitials: "AK",
-    category: "Education",
-    categoryColor: "#0052cc",
-    date: "Sep 12, 2026",
-    views: 890,
-  },
-  {
-    id: "3",
-    title: "Quantum Computing Applications in Cryptographic Security Protocols",
-    abstract: "An exploration of post-quantum cryptographic algorithms and their implications for current internet security infrastructure...",
-    author: "Dr. Priya Sharma",
-    authorInitials: "PS",
-    category: "Technology & Innovation",
-    categoryColor: "#4a148c",
-    date: "Sep 10, 2026",
-    views: 2150,
-  },
-  {
-    id: "4",
-    title: "Social Media's Role in Shaping Political Discourse: A Longitudinal Study",
-    abstract: "A five-year study analyzing the evolution of political communication patterns across major social media platforms and their impact on voter behavior...",
-    author: "Dr. James Wilson",
-    authorInitials: "JW",
-    category: "Social Sciences",
-    categoryColor: "#1a237e",
-    date: "Sep 8, 2026",
-    views: 1670,
-  },
+function formatDate(date: Date | null | undefined): string {
+  if (!date) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(date));
+}
+
+// 6 blank placeholder slots when database has no published papers yet
+const BLANK_SLOTS = [
+  { id: "slot-1", label: "Volume I · Issue 1", tag: "Slot Open" },
+  { id: "slot-2", label: "Volume I · Issue 2", tag: "Under Review" },
+  { id: "slot-3", label: "Volume I · Issue 3", tag: "Awaiting Paper" },
+  { id: "slot-4", label: "Volume I · Issue 4", tag: "Slot Open" },
+  { id: "slot-5", label: "Volume I · Issue 5", tag: "Under Review" },
+  { id: "slot-6", label: "Volume I · Issue 6", tag: "Awaiting Paper" },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch real data from the database safely
+  let publishedPapers: any[] = [];
+  let popularPapers: any[] = [];
+
+  try {
+    const [published, popular] = await Promise.all([
+      prisma.paper.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { publishedAt: "desc" },
+        take: 8,
+        include: {
+          category: { select: { name: true, color: true } },
+          author: { select: { name: true, email: true } },
+        },
+      }),
+      prisma.paper.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { viewCount: "desc" },
+        take: 8,
+        include: {
+          category: { select: { name: true, color: true } },
+          author: { select: { name: true, email: true } },
+        },
+      }),
+    ]);
+
+    publishedPapers = published;
+    popularPapers = popular;
+  } catch (error) {
+    console.error("Database query fallback on homepage:", error);
+  }
+
+  // Double items for seamless infinite carousel loop
+  const latestList = publishedPapers.length > 0 ? [...publishedPapers, ...publishedPapers] : [];
+  const popularList = popularPapers.length > 0 ? [...popularPapers, ...popularPapers] : [];
+  const blankLatestList = [...BLANK_SLOTS, ...BLANK_SLOTS];
+  const blankPopularList = [...BLANK_SLOTS, ...BLANK_SLOTS];
+
   return (
-    <>
+    <div className={styles.pageWrapper}>
+      {/* Top Bar — untouched as requested */}
       <Header />
 
-      <main>
-        {/* ─── Hero Section ──────────────────────────────── */}
+      <main id="main-content">
+        {/* ─── Hero Section with Nature Background at Top ──────────── */}
         <section className={styles.hero}>
           <div className={styles.heroOverlay} />
-          <div className={styles.heroGlow} />
-          <div className={styles.heroGlow2} />
 
-          <div className={styles.heroContent}>
-            <div className={styles.heroText}>
+          <div className={styles.heroContainer}>
+            <div className={styles.heroContent}>
               <div className={styles.heroBadge}>
                 <span className={styles.heroBadgeDot} />
-                Open Access Publishing
+                Open Access Academic Platform
               </div>
 
               <h1 className={styles.heroTitle}>
-                Publish Your Research.<br />
-                <span className={styles.heroTitleAccent}>Shape the Future.</span>
+                Publish Impactful Research.
+                <span className={styles.heroTitleAccent}>Peer-Reviewed & Open to the World.</span>
               </h1>
 
               <p className={styles.heroDescription}>
-                Shaoor is a modern peer-reviewed academic platform where
-                researchers submit, review, and publish impactful papers
-                across disciplines — powered by rigorous review and AI assistance.
+                Shaoor is a peer-reviewed scholarly publishing platform built for researchers,
+                authors, and academics. Experience transparent double-blind review,
+                open access indexing, and AI-powered academic guidance.
               </p>
 
               <div className={styles.heroActions}>
+                <Link href="/submit" className={styles.primaryCta}>
+                  <Send size={15} />
+                  Submit Your Manuscript
+                </Link>
+                <Link href="/papers" className={styles.secondaryCta}>
+                  <Search size={15} />
+                  Explore Papers
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className={styles.heroDivider} />
+        </section>
+
+        {/* ─── Solid Pure White Body Below Hero ────────────────────── */}
+        <div className={styles.solidBody}>
+          {/* ─── Section 1: Latest Publishes (Revolving Left) ───────── */}
+          <section className={styles.sectionWrapper}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionTitleGroup}>
+                <div className={styles.sectionTag}>
+                  <Clock size={11} />
+                  Recent Issues
+                </div>
+                <h2 className={styles.sectionHeading}>Latest Publishes</h2>
+                <p className={styles.sectionSubheading}>
+                  Recently published peer-reviewed research articles across all disciplines.
+                </p>
+              </div>
+
+              <Link href="/papers" className={styles.viewAllBtn} id="view-all-latest-btn">
+                View All Papers <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className={styles.carouselContainer} aria-label="Revolving carousel of latest published papers">
+              <div className={styles.trackScrollLeft}>
+                {publishedPapers.length > 0 ? (
+                  latestList.map((paper, idx) => (
+                    <Link
+                      key={`latest-${paper.id}-${idx}`}
+                      href={`/papers/${paper.id}`}
+                      className={styles.paperCard}
+                    >
+                      <div>
+                        <div className={styles.cardHeader}>
+                          <span className={styles.cardCategory}>
+                            {paper.category?.name || "General"}
+                          </span>
+                          <span className={styles.cardViews}>
+                            <Eye size={12} />
+                            {paper.viewCount || 0}
+                          </span>
+                        </div>
+                        <h3 className={styles.cardTitle}>{paper.title}</h3>
+                        <p className={styles.cardAbstract}>{paper.abstract}</p>
+                      </div>
+
+                      <div className={styles.cardFooter}>
+                        <span className={styles.cardAuthor}>
+                          {paper.author?.name || "Anonymous Author"}
+                        </span>
+                        <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  // Blank placeholder cards dynamically filled as papers are published
+                  blankLatestList.map((slot, idx) => (
+                    <div key={`blank-latest-${slot.id}-${idx}`} className={styles.blankCard}>
+                      <div>
+                        <div className={styles.cardHeader}>
+                          <span className={styles.blankBadge}>
+                            <Clock size={10} />
+                            {slot.tag}
+                          </span>
+                          <div className={styles.blankIconWrap}>
+                            <FileText size={15} />
+                          </div>
+                        </div>
+
+                        <div className={styles.blankSkeletonBox}>
+                          <div className={styles.skeletonLine} />
+                          <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
+                        </div>
+
+                        <p className={styles.blankNotice}>
+                          {slot.label} — This slot automatically populates as soon as a paper completes peer review and publishes.
+                        </p>
+                      </div>
+
+                      <Link href="/submit" className={styles.blankActionLink}>
+                        Submit manuscript to fill slot <ArrowRight size={12} />
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* ─── Section 2: Popular Research (Revolving Right) ──────── */}
+          <section className={styles.sectionWrapperAlt}>
+            <div className={styles.sectionHeader}>
+              <div className={styles.sectionTitleGroup}>
+                <div className={styles.sectionTag}>
+                  <TrendingUp size={11} />
+                  High Impact
+                </div>
+                <h2 className={styles.sectionHeading}>Popular Research</h2>
+                <p className={styles.sectionSubheading}>
+                  Most viewed and referenced publications ranked by community readership.
+                </p>
+              </div>
+
+              <Link href="/papers" className={styles.viewAllBtn} id="view-all-popular-btn">
+                View All Popular <ArrowRight size={13} />
+              </Link>
+            </div>
+
+            <div className={styles.carouselContainer} aria-label="Revolving carousel of popular papers in opposite direction">
+              <div className={styles.trackScrollRight}>
+                {popularPapers.length > 0 ? (
+                  popularList.map((paper, idx) => (
+                    <Link
+                      key={`popular-${paper.id}-${idx}`}
+                      href={`/papers/${paper.id}`}
+                      className={styles.paperCard}
+                    >
+                      <div>
+                        <div className={styles.cardHeader}>
+                          <span className={styles.cardCategory}>
+                            {paper.category?.name || "General"}
+                          </span>
+                          <span className={styles.cardViews}>
+                            <Eye size={12} />
+                            {paper.viewCount || 0}
+                          </span>
+                        </div>
+                        <h3 className={styles.cardTitle}>{paper.title}</h3>
+                        <p className={styles.cardAbstract}>{paper.abstract}</p>
+                      </div>
+
+                      <div className={styles.cardFooter}>
+                        <span className={styles.cardAuthor}>
+                          {paper.author?.name || "Anonymous Author"}
+                        </span>
+                        <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  // Blank placeholder cards dynamically filled as views and papers accumulate
+                  blankPopularList.map((slot, idx) => (
+                    <div key={`blank-pop-${slot.id}-${idx}`} className={styles.blankCard}>
+                      <div>
+                        <div className={styles.cardHeader}>
+                          <span className={styles.blankBadge}>
+                            <TrendingUp size={10} />
+                            {slot.tag}
+                          </span>
+                          <div className={styles.blankIconWrap}>
+                            <Sparkles size={15} />
+                          </div>
+                        </div>
+
+                        <div className={styles.blankSkeletonBox}>
+                          <div className={styles.skeletonLine} />
+                          <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
+                        </div>
+
+                        <p className={styles.blankNotice}>
+                          Trending Slot #{idx % 6 + 1} — Dynamically pulled from database and sorted by view count once papers receive readership.
+                        </p>
+                      </div>
+
+                      <Link href="/submit" className={styles.blankActionLink}>
+                        Publish high-impact work <ArrowRight size={12} />
+                      </Link>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* ─── Platform Features (Solid Clean Cards) ──────────────── */}
+          <section className={styles.featuresGrid}>
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconWrap}>
+                <ShieldCheck size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Rigorous Peer Review</h3>
+              <p className={styles.featureDescription}>
+                Standardized evaluation criteria and double-blind peer review maintain high editorial standards
+                while providing constructive feedback to authors.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconWrap}>
+                <Zap size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>AI Academic Guidance</h3>
+              <p className={styles.featureDescription}>
+                Integrated Gemini AI assistance helps scholars structure submissions, verify methodology,
+                and navigate publication standards seamlessly.
+              </p>
+            </div>
+
+            <div className={styles.featureCard}>
+              <div className={styles.featureIconWrap}>
+                <Globe2 size={22} />
+              </div>
+              <h3 className={styles.featureTitle}>Global Open Access</h3>
+              <p className={styles.featureDescription}>
+                All accepted publications are immediately accessible worldwide with permanent archival,
+                clean metadata, and open citation availability.
+              </p>
+            </div>
+          </section>
+
+          {/* ─── CTA Banner ─────────────────────────────────────────── */}
+          <section className={styles.ctaBanner}>
+            <div className={styles.ctaBox}>
+              <div className={styles.ctaLeft}>
+                <h2 className={styles.ctaTitle}>Ready to Share Your Research?</h2>
+                <p className={styles.ctaDescription}>
+                  Join the growing network of authors and reviewers publishing on Shaoor.
+                  Submit your manuscript today or browse existing open access papers.
+                </p>
+              </div>
+
+              <div className={styles.ctaButtonGroup}>
                 <Link href="/submit" className={styles.ctaBtnWhite}>
-                  <FileText size={18} />
-                  Submit a Paper
+                  <Send size={15} />
+                  Start Submission
                 </Link>
                 <Link href="/papers" className={styles.ctaBtnOutline}>
-                  <Search size={18} />
+                  <Search size={15} />
                   Browse Papers
                 </Link>
               </div>
             </div>
-
-            <div className={styles.heroVisual}>
-              <div className={styles.floatingCards}>
-                <div className={`${styles.floatingCard} ${styles.card1}`}>
-                  <div className={styles.cardLabel}>Published Paper</div>
-                  <div className={styles.cardTitle}>
-                    Advances in Natural Language Processing for Low-Resource Languages
-                  </div>
-                  <div className={styles.cardMeta}>Dr. A. Rashid · 2,340 views</div>
-                </div>
-
-                <div className={`${styles.floatingCard} ${styles.card2}`}>
-                  <div className={styles.cardLabel}>Under Review</div>
-                  <div className={styles.cardTitle}>
-                    Sustainable Urban Development Strategies
-                  </div>
-                  <div className={styles.cardMeta}>2 reviewers assigned</div>
-                </div>
-
-                <div className={`${styles.floatingCard} ${styles.card3}`}>
-                  <div className={styles.cardLabel}>Just Accepted ✓</div>
-                  <div className={styles.cardTitle}>
-                    Climate Change Impact on Agricultural Yield
-                  </div>
-                  <div className={styles.cardMeta}>Score: 9.2/10</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Stats Bar ─────────────────────────────────── */}
-        <section className={styles.statsBar}>
-          <div className={styles.statsGrid}>
-            <div className={styles.statItem}>
-              <div className={styles.statNumber}>2,500+</div>
-              <div className={styles.statLabel}>Papers Published</div>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statNumber}>150+</div>
-              <div className={styles.statLabel}>Expert Reviewers</div>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statNumber}>45</div>
-              <div className={styles.statLabel}>Countries</div>
-            </div>
-            <div className={styles.statItem}>
-              <div className={styles.statNumber}>98%</div>
-              <div className={styles.statLabel}>Author Satisfaction</div>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Features Section ──────────────────────────── */}
-        <section className={styles.features}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionTag}>Why Shaoor</span>
-            <h2 className={styles.sectionTitle}>A Better Way to Publish</h2>
-            <p className={styles.sectionDescription}>
-              Modern tools for modern researchers. From submission to publication,
-              every step is streamlined.
-            </p>
-          </div>
-
-          <div className={styles.featureGrid}>
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #1a237e, #0052cc)" }}
-              >
-                <Shield size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>Rigorous Peer Review</h3>
-              <p className={styles.featureDescription}>
-                Multi-reviewer system with transparent feedback. Every paper
-                undergoes thorough evaluation by domain experts before publication.
-              </p>
-            </div>
-
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #4a148c, #7c43bd)" }}
-              >
-                <Sparkles size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>AI Research Assistant</h3>
-              <p className={styles.featureDescription}>
-                Built-in AI assistant helps you summarize papers, navigate the
-                platform, and discover related research across disciplines.
-              </p>
-            </div>
-
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #00695c, #26a69a)" }}
-              >
-                <Zap size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>Fast Publication</h3>
-              <p className={styles.featureDescription}>
-                Average review turnaround of 2-3 weeks. Real-time status tracking
-                from submission to publication with email notifications.
-              </p>
-            </div>
-
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #bf360c, #ff6e40)" }}
-              >
-                <BookOpen size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>Open Access</h3>
-              <p className={styles.featureDescription}>
-                All published papers are freely accessible. No paywalls,
-                no subscription barriers. Knowledge should be shared openly.
-              </p>
-            </div>
-
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #1b5e20, #66bb6a)" }}
-              >
-                <Users size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>ORCID Integration</h3>
-              <p className={styles.featureDescription}>
-                Sign in with your ORCID iD to automatically link your
-                publications to your researcher profile across the ecosystem.
-              </p>
-            </div>
-
-            <div className={styles.featureCard}>
-              <div
-                className={styles.featureIcon}
-                style={{ background: "linear-gradient(135deg, #0d47a1, #42a5f5)" }}
-              >
-                <Eye size={24} />
-              </div>
-              <h3 className={styles.featureTitle}>Version Control</h3>
-              <p className={styles.featureDescription}>
-                Full revision history for every paper. Track changes between
-                versions and see exactly how feedback shaped the final publication.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ─── Recent Papers ─────────────────────────────── */}
-        <section className={styles.recentPapers}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionTag}>Latest Research</span>
-            <h2 className={styles.sectionTitle}>Recently Published</h2>
-            <p className={styles.sectionDescription}>
-              Explore the latest peer-reviewed papers across all disciplines.
-            </p>
-          </div>
-
-          <div className={styles.papersGrid}>
-            {samplePapers.map((paper) => (
-              <Link
-                key={paper.id}
-                href={`/papers/${paper.id}`}
-                style={{ textDecoration: "none" }}
-              >
-                <article className={styles.paperCard}>
-                  <div
-                    className={styles.paperCategory}
-                    style={{
-                      background: `${paper.categoryColor}12`,
-                      color: paper.categoryColor,
-                    }}
-                  >
-                    <span
-                      className={styles.paperCategoryDot}
-                      style={{ background: paper.categoryColor }}
-                    />
-                    {paper.category}
-                  </div>
-
-                  <h3 className={styles.paperTitle}>{paper.title}</h3>
-                  <p className={`${styles.paperAbstract} line-clamp-2`}>
-                    {paper.abstract}
-                  </p>
-
-                  <div className={styles.paperMeta}>
-                    <div className={styles.paperAuthor}>
-                      <div className={styles.paperAuthorAvatar}>
-                        {paper.authorInitials}
-                      </div>
-                      {paper.author}
-                    </div>
-                    <span>
-                      <Calendar size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />
-                      {paper.date}
-                    </span>
-                    <span>
-                      <Eye size={12} style={{ marginRight: 4, verticalAlign: "middle" }} />
-                      {paper.views.toLocaleString()} views
-                    </span>
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
-
-          <div style={{ textAlign: "center", marginTop: "var(--space-10)", padding: "0 var(--page-padding)" }}>
-            <Link href="/papers" className={styles.ctaBtnOutline} style={{ borderColor: "var(--color-accent-500)", color: "var(--color-accent-500)" }}>
-              View All Papers <ArrowRight size={16} />
-            </Link>
-          </div>
-        </section>
-
-        {/* ─── CTA Section ───────────────────────────────── */}
-        <section className={styles.cta}>
-          <div className={styles.ctaPattern} />
-          <div className={styles.ctaContent}>
-            <h2 className={styles.ctaTitle}>
-              Ready to Share Your Research?
-            </h2>
-            <p className={styles.ctaDescription}>
-              Join thousands of researchers publishing with Shaoor.
-              Submit your paper today and reach a global audience.
-            </p>
-            <div className={styles.ctaButtons}>
-              <Link href="/submit" className={styles.ctaBtnWhite}>
-                <FileText size={18} />
-                Start Submission
-              </Link>
-              <Link href="/about" className={styles.ctaBtnOutline}>
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
 
+      {/* Footer — crisp solid dark slate with no muddy washing out */}
       <Footer />
-    </>
+    </div>
   );
 }
