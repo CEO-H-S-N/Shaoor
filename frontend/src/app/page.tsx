@@ -81,12 +81,10 @@ export default async function HomePage() {
       <Header />
 
       <main id="main-content">
-        {/* ─── Hero Section with Nature Background at Top ──────────── */}
+        {/* ─── Hero Section with Nature Background at Top (No Card, No Overlay) ─── */}
         <section className={styles.hero}>
-          <div className={styles.heroOverlay} />
-
           <div className={styles.heroContainer}>
-            <div className={styles.heroContent}>
+            <div className={styles.heroTextOnly}>
               <div className={styles.heroBadge}>
                 <span className={styles.heroBadgeDot} />
                 Open Access Academic Platform
@@ -102,19 +100,10 @@ export default async function HomePage() {
                 authors, and academics. Experience transparent double-blind review,
                 open access indexing, and AI-powered academic guidance.
               </p>
-
-              <div className={styles.heroActions}>
-                <Link href="/submit" className={styles.primaryCta}>
-                  <Send size={15} />
-                  Submit Your Manuscript
-                </Link>
-                <Link href="/papers" className={styles.secondaryCta}>
-                  <Search size={15} />
-                  Explore Papers
-                </Link>
-              </div>
             </div>
           </div>
+
+          {/* Flat white line divider (no fade) */}
           <div className={styles.heroDivider} />
         </section>
 

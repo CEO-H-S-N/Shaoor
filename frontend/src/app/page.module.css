@@ -17,7 +17,7 @@
 /* ─── Hero Section (Nature Background at Top of Screen) ───── */
 .hero {
   position: relative;
-  min-height: 560px;
+  min-height: 480px;
   background-image: url("/nature-bg.jpg");
   background-size: cover;
   background-position: center 35%;
@@ -27,44 +27,22 @@
   overflow: hidden;
 }
 
-/* Subtle top & bottom shadow gradient so nature landscape remains vibrant */
-.heroOverlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(15, 23, 42, 0.15) 0%,
-    rgba(15, 23, 42, 0.05) 50%,
-    rgba(255, 255, 255, 0.4) 85%,
-    #ffffff 100%
-  );
-  pointer-events: none;
-}
-
 .heroContainer {
   max-width: 1240px;
   width: 100%;
   margin: 0 auto;
-  padding: 56px 28px 72px;
+  padding: 64px 28px 72px;
   position: relative;
   z-index: 2;
   display: flex;
   justify-content: flex-start;
 }
 
-.heroContent {
-  max-width: 680px;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  border-left: 4px solid #1e3a8a;
-  border-radius: 4px;
-  padding: 40px 44px;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14);
+.heroTextOnly {
+  max-width: 760px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .heroBadge {
@@ -72,7 +50,9 @@
   align-items: center;
   gap: 8px;
   padding: 5px 12px;
-  background: #eff6ff;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid #bfdbfe;
   border-radius: 4px;
   color: #1e3a8a;
@@ -81,6 +61,7 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
   width: fit-content;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
 .heroBadgeDot {
@@ -92,12 +73,13 @@
 }
 
 .heroTitle {
-  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-size: clamp(2.2rem, 3.8vw, 3.25rem);
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.2;
+  line-height: 1.18;
   letter-spacing: -0.025em;
   margin: 0;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 20px rgba(255, 255, 255, 0.95);
 }
 
 .heroTitleAccent {
@@ -106,73 +88,23 @@
 }
 
 .heroDescription {
-  font-size: 1rem;
-  color: #334155;
+  font-size: 1.0625rem;
+  color: #1e293b;
+  font-weight: 500;
   line-height: 1.6;
   margin: 0;
+  max-width: 680px;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9), 0 0 16px rgba(255, 255, 255, 0.95);
 }
 
-.heroActions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-  padding-top: 4px;
-}
-
-.primaryCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  background: #1e3a8a;
-  color: #ffffff !important;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 4px;
-  border: 1.5px solid #1e3a8a;
-  text-decoration: none;
-  box-shadow: 0 4px 14px rgba(30, 58, 138, 0.25);
-  transition: all 0.2s ease;
-}
-
-.primaryCta:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(30, 58, 138, 0.35);
-}
-
-.secondaryCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 11px 22px;
-  background: #ffffff;
-  color: #1e3a8a !important;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  border-radius: 4px;
-  border: 1.5px solid #bfdbfe;
-  text-decoration: none;
-  box-shadow: 0 2px 6px rgba(30, 58, 138, 0.06);
-  transition: all 0.2s ease;
-}
-
-.secondaryCta:hover {
-  background: #eff6ff;
-  border-color: #1e3a8a;
-  transform: translateY(-2px);
-}
-
-/* ─── Hero Divider ────────────────────────────────────────── */
+/* ─── Flat White Line Divider (No Fade) ───────────────────── */
 .heroDivider {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 2px;
-  background: #1e3a8a;
+  height: 4px;
+  background: #ffffff;
   z-index: 3;
 }
 
