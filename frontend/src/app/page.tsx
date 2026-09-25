@@ -86,11 +86,6 @@ export default async function HomePage() {
           <div className={styles.heroBackdrop} />
           <div className={styles.heroContainer}>
             <div className={styles.heroTextOnly}>
-              <div className={styles.heroBadge}>
-                <span className={styles.heroBadgeDot} />
-                Open Access Academic Platform
-              </div>
-
               <h1 className={styles.heroTitle}>
                 Publish Impactful Research.
                 <span className={styles.heroTitleAccent}>Peer-Reviewed & Open to the World.</span>
@@ -110,14 +105,12 @@ export default async function HomePage() {
 
         {/* ─── Solid Pure White Body Below Hero ────────────────────── */}
         <div className={styles.solidBody}>
-          {/* ─── Section 1: Latest Publishes (Revolving Left) ───────── */}
+          <div className={styles.stripeSpacer} />
+
+          {/* ─── Section 1: Latest Publishes (Revolving Left - Blue Stripe) ─── */}
           <section className={styles.sectionWrapper}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
-                <div className={styles.sectionTag}>
-                  <Clock size={11} />
-                  Recent Issues
-                </div>
                 <h2 className={styles.sectionHeading}>Latest Publishes</h2>
                 <p className={styles.sectionSubheading}>
                   Recently published peer-reviewed research articles across all disciplines.
@@ -195,14 +188,12 @@ export default async function HomePage() {
             </div>
           </section>
 
+          <div className={styles.stripeSpacer} />
+
           {/* ─── Section 2: Popular Research (Revolving Right) ──────── */}
           <section className={styles.sectionWrapperAlt}>
             <div className={styles.sectionHeader}>
               <div className={styles.sectionTitleGroup}>
-                <div className={styles.sectionTag}>
-                  <TrendingUp size={11} />
-                  High Impact
-                </div>
                 <h2 className={styles.sectionHeading}>Popular Research</h2>
                 <p className={styles.sectionSubheading}>
                   Most viewed and referenced publications ranked by community readership.
@@ -279,6 +270,8 @@ export default async function HomePage() {
               </div>
             </div>
           </section>
+
+          <div className={styles.stripeSpacer} />
 
           {/* ─── Platform Features (Solid Clean Cards) ──────────────── */}
           <section className={styles.featuresGrid}>

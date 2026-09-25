@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
@@ -50,19 +51,19 @@ export function Header() {
           />
         </a>
 
-        {/* Desktop Nav Links */}
+        {/* Desktop Nav Links (Next.js Link for smooth client navigation without triggering splash) */}
         <ul className={styles.navLinks}>
           <li>
-            <a href="/" className={`${styles.navLink} ${isActive("/") ? styles.navLinkActive : ""}`}>Home</a>
+            <Link href="/" className={`${styles.navLink} ${isActive("/") ? styles.navLinkActive : ""}`}>Home</Link>
           </li>
           <li>
-            <a href="/papers" className={`${styles.navLink} ${isActive("/papers") ? styles.navLinkActive : ""}`}>Papers</a>
+            <Link href="/papers" className={`${styles.navLink} ${isActive("/papers") ? styles.navLinkActive : ""}`}>Papers</Link>
           </li>
           <li>
-            <a href="/about" className={`${styles.navLink} ${isActive("/about") ? styles.navLinkActive : ""}`}>About</a>
+            <Link href="/about" className={`${styles.navLink} ${isActive("/about") ? styles.navLinkActive : ""}`}>About</Link>
           </li>
           <li>
-            <a href="/submit" className={`${styles.navLink} ${isActive("/submit") ? styles.navLinkActive : ""}`}>Submit</a>
+            <Link href="/submit" className={`${styles.navLink} ${isActive("/submit") ? styles.navLinkActive : ""}`}>Submit</Link>
           </li>
         </ul>
 
@@ -70,10 +71,10 @@ export function Header() {
         <div className={styles.authArea}>
           {isLoggedIn ? (
             <div className={styles.authDesktopGroup}>
-              <a href={dashboardHref} className={styles.dashboardLink} id="header-dashboard-link">
+              <Link href={dashboardHref} className={styles.dashboardLink} id="header-dashboard-link">
                 <LayoutDashboard size={14} />
                 {dashboardLabel}
-              </a>
+              </Link>
 
               <div className={styles.userBadge}>
                 <div className={styles.userInitial}>
@@ -98,8 +99,8 @@ export function Header() {
             </div>
           ) : (
             <div className={styles.authDesktopGroup}>
-              <a href="/login" className={styles.signInBtn}>Sign in</a>
-              <a href="/login" className={styles.submitBtn}>Submit a Paper</a>
+              <Link href="/login" className={styles.signInBtn}>Sign in</Link>
+              <Link href="/login" className={styles.submitBtn}>Submit a Paper</Link>
             </div>
           )}
 
@@ -118,13 +119,13 @@ export function Header() {
       {/* Mobile Menu */}
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ""}`}>
         <ul className={styles.mobileNavLinks}>
-          <li><a href="/" onClick={() => setMobileMenuOpen(false)}>Home</a></li>
-          <li><a href="/papers" onClick={() => setMobileMenuOpen(false)}>Papers</a></li>
-          <li><a href="/about" onClick={() => setMobileMenuOpen(false)}>About</a></li>
-          <li><a href="/submit" onClick={() => setMobileMenuOpen(false)}>Submit a Paper</a></li>
+          <li><Link href="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
+          <li><Link href="/papers" onClick={() => setMobileMenuOpen(false)}>Papers</Link></li>
+          <li><Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
+          <li><Link href="/submit" onClick={() => setMobileMenuOpen(false)}>Submit a Paper</Link></li>
           {isLoggedIn ? (
             <li style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
-              <a
+              <Link
                 href={dashboardHref}
                 onClick={() => setMobileMenuOpen(false)}
                 className={styles.dashboardLink}
@@ -132,7 +133,7 @@ export function Header() {
               >
                 <LayoutDashboard size={15} />
                 {dashboardLabel}
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={() => { setMobileMenuOpen(false); signOut({ callbackUrl: "/login" }); }}
@@ -145,9 +146,9 @@ export function Header() {
             </li>
           ) : (
             <li style={{ marginTop: "12px" }}>
-              <a href="/login" onClick={() => setMobileMenuOpen(false)} className={styles.submitBtn} style={{ display: "block", textAlign: "center", width: "100%" }}>
+              <Link href="/login" onClick={() => setMobileMenuOpen(false)} className={styles.submitBtn} style={{ display: "block", textAlign: "center", width: "100%" }}>
                 Sign In / Register
-              </a>
+              </Link>
             </li>
           )}
         </ul>
