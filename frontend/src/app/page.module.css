@@ -220,16 +220,16 @@
   background: transparent;
   mask-image: linear-gradient(
     to right,
-    transparent 0%,
-    black 4%,
-    black 96%,
+    transparent 0px,
+    #000000 240px,
+    #000000 calc(100% - 240px),
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to right,
-    transparent 0%,
-    black 4%,
-    black 96%,
+    transparent 0px,
+    #000000 240px,
+    #000000 calc(100% - 240px),
     transparent 100%
   );
 }

@@ -69,11 +69,20 @@ export default async function HomePage() {
     console.error("Database query fallback on homepage:", error);
   }
 
-  // Double items for seamless infinite carousel loop
-  const latestList = publishedPapers.length > 0 ? [...publishedPapers, ...publishedPapers] : [];
-  const popularList = popularPapers.length > 0 ? [...popularPapers, ...popularPapers] : [];
-  const blankLatestList = [...BLANK_SLOTS, ...BLANK_SLOTS];
-  const blankPopularList = [...BLANK_SLOTS, ...BLANK_SLOTS];
+  // Ensure plenty of cards so the track is always completely populated across all screen sizes
+  function makeLoopList<T>(items: T[], minLength = 12): T[] {
+    if (items.length === 0) return [];
+    let base = [...items];
+    while (base.length < minLength) {
+      base = [...base, ...items];
+    }
+    return [...base, ...base];
+  }
+
+  const latestList = makeLoopList(publishedPapers);
+  const popularList = makeLoopList(popularPapers);
+  const blankLatestList = makeLoopList(BLANK_SLOTS);
+  const blankPopularList = makeLoopList(BLANK_SLOTS);
 
   return (
     <div className={styles.pageWrapper}>
