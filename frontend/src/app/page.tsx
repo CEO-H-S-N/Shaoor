@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { RevolvingCarouselTrack } from "@/components/home/RevolvingCarouselTrack";
 import { prisma } from "@/lib/prisma";
 import styles from "./page.module.css";
 
@@ -131,70 +132,73 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className={styles.carouselContainer} aria-label="Revolving carousel of latest published papers">
-              <div className={styles.trackScrollLeft}>
-                {publishedPapers.length > 0 ? (
-                  latestList.map((paper, idx) => (
-                    <Link
-                      key={`latest-${paper.id}-${idx}`}
-                      href={`/papers/${paper.id}`}
-                      className={styles.paperCard}
-                    >
-                      <div>
-                        <div className={styles.cardHeader}>
-                          <span className={styles.cardCategory}>
-                            {paper.category?.name || "General"}
-                          </span>
-                          <span className={styles.cardViews}>
-                            <Eye size={12} />
-                            {paper.viewCount || 0}
-                          </span>
-                        </div>
-                        <h3 className={styles.cardTitle}>{paper.title}</h3>
-                        <p className={styles.cardAbstract}>{paper.abstract}</p>
-                      </div>
-
-                      <div className={styles.cardFooter}>
-                        <span className={styles.cardAuthor}>
-                          {paper.author?.name || "Anonymous Author"}
+            <RevolvingCarouselTrack
+              direction="left"
+              containerClassName={styles.carouselContainer}
+              className={styles.trackScrollLeft}
+              ariaLabel="Revolving carousel of latest published papers"
+            >
+              {publishedPapers.length > 0 ? (
+                latestList.map((paper, idx) => (
+                  <Link
+                    key={`latest-${paper.id}-${idx}`}
+                    href={`/papers/${paper.id}`}
+                    className={styles.paperCard}
+                  >
+                    <div>
+                      <div className={styles.cardHeader}>
+                        <span className={styles.cardCategory}>
+                          {paper.category?.name || "General"}
                         </span>
-                        <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                        <span className={styles.cardViews}>
+                          <Eye size={12} />
+                          {paper.viewCount || 0}
+                        </span>
                       </div>
-                    </Link>
-                  ))
-                ) : (
-                  // Blank placeholder cards dynamically filled as papers are published
-                  blankLatestList.map((slot, idx) => (
-                    <div key={`blank-latest-${slot.id}-${idx}`} className={styles.blankCard}>
-                      <div>
-                        <div className={styles.cardHeader}>
-                          <span className={styles.blankBadge}>
-                            <Clock size={10} />
-                            {slot.tag}
-                          </span>
-                          <div className={styles.blankIconWrap}>
-                            <FileText size={15} />
-                          </div>
-                        </div>
-
-                        <div className={styles.blankSkeletonBox}>
-                          <div className={styles.skeletonLine} />
-                          <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
-                        </div>
-
-                        <p className={styles.blankNotice}>
-                          {slot.label} — This slot automatically populates as soon as a paper completes peer review and publishes.
-                        </p>
-                      </div>
-
-                      <Link href="/submit" className={styles.blankActionLink}>
-                        Submit manuscript to fill slot <ArrowRight size={12} />
-                      </Link>
+                      <h3 className={styles.cardTitle}>{paper.title}</h3>
+                      <p className={styles.cardAbstract}>{paper.abstract}</p>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
+
+                    <div className={styles.cardFooter}>
+                      <span className={styles.cardAuthor}>
+                        {paper.author?.name || "Anonymous Author"}
+                      </span>
+                      <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                // Blank placeholder cards dynamically filled as papers are published
+                blankLatestList.map((slot, idx) => (
+                  <div key={`blank-latest-${slot.id}-${idx}`} className={styles.blankCard}>
+                    <div>
+                      <div className={styles.cardHeader}>
+                        <span className={styles.blankBadge}>
+                          <Clock size={10} />
+                          {slot.tag}
+                        </span>
+                        <div className={styles.blankIconWrap}>
+                          <FileText size={15} />
+                        </div>
+                      </div>
+
+                      <div className={styles.blankSkeletonBox}>
+                        <div className={styles.skeletonLine} />
+                        <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
+                      </div>
+
+                      <p className={styles.blankNotice}>
+                        {slot.label} — This slot automatically populates as soon as a paper completes peer review and publishes.
+                      </p>
+                    </div>
+
+                    <Link href="/submit" className={styles.blankActionLink}>
+                      Submit manuscript to fill slot <ArrowRight size={12} />
+                    </Link>
+                  </div>
+                ))
+              )}
+            </RevolvingCarouselTrack>
           </section>
 
           <div className={styles.stripeSpacer} />
@@ -214,70 +218,73 @@ export default async function HomePage() {
               </Link>
             </div>
 
-            <div className={styles.carouselContainer} aria-label="Revolving carousel of popular papers in opposite direction">
-              <div className={styles.trackScrollRight}>
-                {popularPapers.length > 0 ? (
-                  popularList.map((paper, idx) => (
-                    <Link
-                      key={`popular-${paper.id}-${idx}`}
-                      href={`/papers/${paper.id}`}
-                      className={styles.paperCard}
-                    >
-                      <div>
-                        <div className={styles.cardHeader}>
-                          <span className={styles.cardCategory}>
-                            {paper.category?.name || "General"}
-                          </span>
-                          <span className={styles.cardViews}>
-                            <Eye size={12} />
-                            {paper.viewCount || 0}
-                          </span>
-                        </div>
-                        <h3 className={styles.cardTitle}>{paper.title}</h3>
-                        <p className={styles.cardAbstract}>{paper.abstract}</p>
-                      </div>
-
-                      <div className={styles.cardFooter}>
-                        <span className={styles.cardAuthor}>
-                          {paper.author?.name || "Anonymous Author"}
+            <RevolvingCarouselTrack
+              direction="right"
+              containerClassName={styles.carouselContainer}
+              className={styles.trackScrollRight}
+              ariaLabel="Revolving carousel of popular papers in opposite direction"
+            >
+              {popularPapers.length > 0 ? (
+                popularList.map((paper, idx) => (
+                  <Link
+                    key={`popular-${paper.id}-${idx}`}
+                    href={`/papers/${paper.id}`}
+                    className={styles.paperCard}
+                  >
+                    <div>
+                      <div className={styles.cardHeader}>
+                        <span className={styles.cardCategory}>
+                          {paper.category?.name || "General"}
                         </span>
-                        <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                        <span className={styles.cardViews}>
+                          <Eye size={12} />
+                          {paper.viewCount || 0}
+                        </span>
                       </div>
-                    </Link>
-                  ))
-                ) : (
-                  // Blank placeholder cards dynamically filled as views and papers accumulate
-                  blankPopularList.map((slot, idx) => (
-                    <div key={`blank-pop-${slot.id}-${idx}`} className={styles.blankCard}>
-                      <div>
-                        <div className={styles.cardHeader}>
-                          <span className={styles.blankBadge}>
-                            <TrendingUp size={10} />
-                            {slot.tag}
-                          </span>
-                          <div className={styles.blankIconWrap}>
-                            <Sparkles size={15} />
-                          </div>
-                        </div>
-
-                        <div className={styles.blankSkeletonBox}>
-                          <div className={styles.skeletonLine} />
-                          <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
-                        </div>
-
-                        <p className={styles.blankNotice}>
-                          Trending Slot #{idx % 6 + 1} — Dynamically pulled from database and sorted by view count once papers receive readership.
-                        </p>
-                      </div>
-
-                      <Link href="/submit" className={styles.blankActionLink}>
-                        Publish high-impact work <ArrowRight size={12} />
-                      </Link>
+                      <h3 className={styles.cardTitle}>{paper.title}</h3>
+                      <p className={styles.cardAbstract}>{paper.abstract}</p>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
+
+                    <div className={styles.cardFooter}>
+                      <span className={styles.cardAuthor}>
+                        {paper.author?.name || "Anonymous Author"}
+                      </span>
+                      <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                    </div>
+                  </Link>
+                ))
+              ) : (
+                // Blank placeholder cards dynamically filled as views and papers accumulate
+                blankPopularList.map((slot, idx) => (
+                  <div key={`blank-pop-${slot.id}-${idx}`} className={styles.blankCard}>
+                    <div>
+                      <div className={styles.cardHeader}>
+                        <span className={styles.blankBadge}>
+                          <TrendingUp size={10} />
+                          {slot.tag}
+                        </span>
+                        <div className={styles.blankIconWrap}>
+                          <Sparkles size={15} />
+                        </div>
+                      </div>
+
+                      <div className={styles.blankSkeletonBox}>
+                        <div className={styles.skeletonLine} />
+                        <div className={`${styles.skeletonLine} ${styles.skeletonShort}`} />
+                      </div>
+
+                      <p className={styles.blankNotice}>
+                        Trending Slot #{idx % 6 + 1} — Dynamically pulled from database and sorted by view count once papers receive readership.
+                      </p>
+                    </div>
+
+                    <Link href="/submit" className={styles.blankActionLink}>
+                      Publish high-impact work <ArrowRight size={12} />
+                    </Link>
+                  </div>
+                ))
+              )}
+            </RevolvingCarouselTrack>
           </section>
 
           <div className={styles.stripeSpacer} />
