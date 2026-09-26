@@ -1,7 +1,7 @@
 # Shaoor.org — Project Tracker
 
 > **Living Document** — Updated as the project progresses.  
-> Last updated: September 20, 2026 (Session 3)
+> Last updated: September 27, 2026 (Session 4 — Landing Page Redesign, Revolving Cards & Polish)
 
 ---
 
@@ -138,6 +138,36 @@
 
 ---
 
+### Phase 4.5: Landing Page Redesign & Presentation Polish ✅ COMPLETED
+- [x] **Nature Hero Header**:
+  - Pure natural mountain lake scenery (`/nature-bg.jpg`) positioned on the top of the screen.
+  - Eliminated bottom image gradients; bounded cleanly by a 4px flat white line divider (`.heroDivider`).
+  - High-contrast pure white typography (`#ffffff`), radiant sky blue accent (`#93c5fd`), and subtle dark text-shadow over a horizontal scrim (`.heroBackdrop`) for crystal readability against trees and mist.
+  - Cleaned up hero by removing the badge, floating stats strip, and duplicate action buttons.
+- [x] **Blue Stripe Pattern with Elevated Cards**:
+  - Configured alternating horizontal bands: pure white body with rich royal navy (`#1e3a8a`) stripes for "Latest Publishes" and "Popular Research", separated by clean white spacers (`.stripeSpacer`).
+  - Headings styled in bold pure white (`#ffffff`) with soft luminous subheadings.
+  - View All buttons styled with translucent glass borders and solid white hover transitions.
+  - High-contrast pure white publication cards (`.paperCard`) and dashed blank slots (`.blankCard`) pop with elevated depth shadows against the blue background.
+- [x] **Dual Stepped Revolving Cards Windows**:
+  - "Latest Publishes" revolving leftward; "Popular Research" revolving rightward in opposite direction.
+  - Stepped cadence: holds steady on each card for ~3s, then smoothly glides ~1s to the next card.
+  - Dynamic Prisma backend queries for latest and most-viewed papers; gracefully displays populated blank cards when no published papers exist yet.
+  - Full-width loop array replication (`makeLoopList`) ensuring the carousel tracks are always full across any screen size without gaps.
+- [x] **Progressive Card-Level Edge Transparency**:
+  - Removed container `mask-image` to eliminate the blue gradient wash and harsh vertical slices on card edges.
+  - Created client component `RevolvingCarouselTrack.tsx` using `requestAnimationFrame` to dynamically compute and update each card's individual element `opacity`.
+  - Cards in the center remain 100% solid white; as each card approaches either screen edge, the **entire card uniformly dissolves into transparency** without any vertical gradient or side slices.
+- [x] **Splash Screen Isolation**:
+  - Converted all header navigation links in `Header.tsx` to Next.js client-side `Link` components.
+  - Navigating across the platform (Home, Papers, About, Submit, Sign in, Dashboard) is instant and never triggers the splash screen.
+  - Splash animation strictly appears **only** on full page reload (F5 / refresh) and when explicitly clicking the Shaoor home logo.
+- [x] **Footer Attribution & Git Synchronization**:
+  - Added "Designed and developed by HSN" to the landing page footer.
+  - All code strictly type-checked with TypeScript (0 errors), committed, and pushed to `main`.
+
+---
+
 ### Phase 5: Testing & Hardening (Planned)
 - [ ] Unit tests (Vitest) — 80%+ coverage target
 - [ ] E2E tests (Playwright) — critical flows
@@ -252,3 +282,9 @@ dr-shaukat-journal/
 | Sep 20, 2026 | Lambda over EC2 | More generous free tier, zero ops |
 | Sep 20, 2026 | PostgreSQL over DynamoDB | Relational data fits SQL perfectly |
 | Sep 20, 2026 | Auth.js over raw OAuth | Handles 90% of auth security automatically |
+| Sep 25, 2026 | Nature Hero Header | Mountain lake landscape atop page with flat white divider line |
+| Sep 25, 2026 | Stepped Carousel Cadence | 3s hold → 1s glide cadence for legible card viewing while revolving |
+| Sep 25, 2026 | Blue Stripe Pattern | High-contrast `#1e3a8a` bands so white cards stand out from body |
+| Sep 25, 2026 | Card-Level Opacity via rAF | Replaced container mask gradient with uniform card-level opacity fade |
+| Sep 25, 2026 | Client Routing for Splash | Soft navigation avoids page reload; splash isolated to F5 & home logo |
+| Sep 25, 2026 | Footer Credit | Added "Designed and developed by HSN" to landing page footer |
