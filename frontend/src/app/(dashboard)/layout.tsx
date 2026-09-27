@@ -17,13 +17,14 @@ export default async function DashboardLayout({
   }
 
   const userRole = (session.user as any).role as "CUSTOMER" | "ADMIN" | "DESIGNER";
+  const isMaster = !!(session.user as any).isMaster || session.user.email === "shouket.tilwani@gmail.com";
 
   return (
     <div className={styles.shell}>
       <Header />
 
       <div className={styles.body}>
-        <DashboardSidebar role={userRole} />
+        <DashboardSidebar role={userRole} isMaster={isMaster} />
 
         <main className={styles.main} id="main-content">
           {children}

@@ -28,6 +28,7 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
+        token.isMaster = (user as any).isMaster ?? (user.email === "shouket.tilwani@gmail.com");
         if ((user as any).image) token.picture = (user as any).image;
         if (user.name) token.name = user.name;
       }
@@ -45,6 +46,7 @@ export const authConfig: NextAuthConfig = {
       if (session.user && token) {
         session.user.id = token.id as string;
         (session.user as any).role = token.role ?? "CUSTOMER";
+        (session.user as any).isMaster = !!(token as any).isMaster || (session.user.email === "shouket.tilwani@gmail.com");
         if (token.name) session.user.name = token.name;
         if (token.picture) session.user.image = token.picture as string;
       }

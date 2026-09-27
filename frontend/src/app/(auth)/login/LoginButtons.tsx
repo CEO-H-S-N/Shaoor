@@ -38,7 +38,9 @@ export function LoginButtons() {
     setError("");
 
     const targetUrl =
-      activeEmail === "devadmin@shaoor.org" ? "/review" : "/my-papers";
+      activeEmail === "devadmin@shaoor.org" || activeEmail === "shouket.tilwani@gmail.com"
+        ? "/review"
+        : "/my-papers";
 
     try {
       const res = await signIn("credentials", {
@@ -108,22 +110,33 @@ export function LoginButtons() {
 
         {/* Dev quick-fill */}
         <div className={styles.quickFillRow}>
-          <span style={{ fontWeight: 600 }}>Dev test:</span>
+          <span style={{ fontWeight: 600 }}>Quick fill:</span>
           <button
             type="button"
             className={styles.quickFillBtn}
-            onClick={() => fillAndSubmit("devuser@shaoor.org", "dev123")}
+            onClick={() => fillAndSubmit("shouket.tilwani@gmail.com", "Tilwani#Shaoor2026!MasterKey")}
             disabled={loading}
+            id="quick-fill-owner"
           >
-            👤 User
+            👑 Owner
           </button>
           <button
             type="button"
             className={styles.quickFillBtn}
             onClick={() => fillAndSubmit("devadmin@shaoor.org", "dev123")}
             disabled={loading}
+            id="quick-fill-admin"
           >
             🛡️ Admin
+          </button>
+          <button
+            type="button"
+            className={styles.quickFillBtn}
+            onClick={() => fillAndSubmit("devuser@shaoor.org", "dev123")}
+            disabled={loading}
+            id="quick-fill-user"
+          >
+            👤 Author
           </button>
         </div>
       </form>

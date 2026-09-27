@@ -21,7 +21,7 @@ const { auth } = NextAuth(authConfig);
 const PUBLIC_ROUTES = ["/", "/papers", "/about", "/guidelines", "/contact", "/faq"];
 const AUTH_ROUTES = ["/login"];
 const PROTECTED_ROUTES = ["/submit", "/my-papers", "/settings", "/notifications"];
-const ADMIN_ROUTES = ["/review"];
+const ADMIN_ROUTES = ["/review", "/admin"];
 const DESIGNER_ROUTES = ["/manage"];
 
 // ─── Bot Detection Signatures ─────────────────────────────────

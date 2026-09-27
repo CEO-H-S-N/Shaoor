@@ -237,6 +237,32 @@
 
 ---
 
+### Phase 4.9: Master Account & Platform Owner Governance System ✅ COMPLETED
+- [x] **Master Account Hardcoded Fast-Path & Role Governance**:
+  - Registered Master Account (`shouket.tilwani@gmail.com`) with role `ADMIN` and persistent credentials in AWS RDS PostgreSQL.
+  - Edge and Node session callbacks extended with `isMaster` flag; displays **`Master Admin`** badge with golden crown icon in the dashboard sidebar.
+  - Added one-click **`👑 Owner`** quick fill button on `/login`.
+- [x] **Administrator Account Generation Portal (`/manage/create-admin`)**:
+  - Left sidebar navigation button: **`Make Admin Account`**.
+  - Form allowing the Platform Owner to generate genuine administrator accounts for professors and scholars by specifying Full Name, Institutional Email, and initial password.
+  - Generates verified, active accounts in AWS RDS PostgreSQL with `bcrypt`-hashed passwords.
+  - Interactive **Invitation Dispatch Card** with 1-click clipboard copy to easily transmit login details via email or WhatsApp.
+  - Real-time directory table of certified platform administrators with paper and review counts.
+- [x] **Account Management, Suspension & Deletion (`/manage/users`)**:
+  - Left sidebar navigation button: **`Manage Accounts`**.
+  - 100% live database registry querying AWS RDS PostgreSQL with zero mock or demo data.
+  - Search by name, email, or affiliation, and filter tabs (All, Administrators, Authors, Active, Suspended).
+  - **Temporary Ban / Reinstate Action**: One-click toggle updating `isActive`, `bannedAt`, and `bannedReason` with instant server sync and session rejection.
+  - **Permanent Deletion Action**: Safe cascade removal of user sessions, accounts, and draft papers with full OWASP A09 audit logging. Master account and self-deletion are strictly protected.
+- [x] **Dynamic CMS Public Page Editing System (`/about` & `/guidelines`)**:
+  - Left sidebar navigation buttons: **`Edit About Page`** (`/admin/edit-about`) and **`Edit Author Guidelines`** (`/admin/edit-guidelines`).
+  - Added `PageContent` (`page_contents`) table to AWS RDS PostgreSQL.
+  - Structured, section-based editorial CMS interface allowing the Platform Owner to update titles, subtitles, and add/edit/reorder/delete content sections with single-click publishing to PostgreSQL.
+  - Built authoritative, prestigious public layouts for both `/about` and `/guidelines` rendering dynamic database content with automatic template defaults and admin edit shortcuts.
+  - Updated global Header and Footer navigation with direct links to both pages.
+
+---
+
 ### Phase 5: Testing & Hardening (Planned)
 - [ ] Unit tests (Vitest) — 80%+ coverage target
 - [ ] E2E tests (Playwright) — critical flows

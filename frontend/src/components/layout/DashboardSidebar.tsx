@@ -8,9 +8,11 @@ import {
   ClipboardList,
   Settings,
   Users,
-  FolderKanban,
-  BarChart3,
+  UserPlus,
+  FileEdit,
+  BookOpenCheck,
   ShieldCheck,
+  Crown,
 } from "lucide-react";
 import styles from "@/app/(dashboard)/layout.module.css";
 
@@ -22,19 +24,21 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/my-papers",  label: "My Papers",    icon: FileText,      roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
-  { href: "/submit",     label: "Submit Paper",  icon: Send,          roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
-  { href: "/review",     label: "Review Queue",  icon: ClipboardList, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/manage/users",      label: "Users",       icon: Users,         roles: ["DESIGNER"] },
-  { href: "/manage/categories", label: "Categories",  icon: FolderKanban,  roles: ["DESIGNER"] },
-  { href: "/manage/analytics",  label: "Analytics",   icon: BarChart3,     roles: ["DESIGNER"] },
+  { href: "/my-papers", label: "My Papers", icon: FileText, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
+  { href: "/submit", label: "Submit Paper", icon: Send, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
+  { href: "/review", label: "Review Queue", icon: ClipboardList, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"] },
 ];
 
 interface Props {
   role: "CUSTOMER" | "ADMIN" | "DESIGNER";
+  isMaster?: boolean;
 }
 
-export function DashboardSidebar({ role }: Props) {
+export function DashboardSidebar({ role, isMaster }: Props) {
   const pathname = usePathname();
 
   const visibleMain = NAV_ITEMS.filter((item) => item.roles.includes(role));
@@ -59,8 +63,8 @@ export function DashboardSidebar({ role }: Props) {
       <nav className={styles.mobileDashboardNav} aria-label="Dashboard mobile navigation">
         <div className={styles.mobileNavPills}>
           <div className={styles.mobileRoleBadge}>
-            <ShieldCheck size={12} />
-            <span>{role === "DESIGNER" ? "Designer" : role === "ADMIN" ? "Admin" : "Author"}</span>
+            {isMaster ? <Crown size={12} style={{ color: "#d97706" }} /> : <ShieldCheck size={12} />}
+            <span>{isMaster ? "Master Admin" : role === "DESIGNER" ? "Designer" : role === "ADMIN" ? "Admin" : "Author"}</span>
           </div>
 
           {visibleMain.map((item) => {
@@ -91,9 +95,16 @@ export function DashboardSidebar({ role }: Props) {
       <aside className={styles.sidebar} aria-label="Dashboard navigation">
         {/* Role badge */}
         <div className={styles.roleBadgeRow}>
-          <ShieldCheck size={14} className={styles.roleIcon} />
-          <span className={styles.roleLabel}>
-            {role === "DESIGNER" ? "Designer" : role === "ADMIN" ? "Admin" : "Author"}
+          {isMaster ? (
+            <Crown size={14} className={styles.roleIcon} style={{ color: "#d97706" }} />
+          ) : (
+            <ShieldCheck size={14} className={styles.roleIcon} />
+          )}
+          <span
+            className={styles.roleLabel}
+            style={isMaster ? { color: "#b45309" } : undefined}
+          >
+            {isMaster ? "Master Admin" : role === "DESIGNER" ? "Designer" : role === "ADMIN" ? "Admin" : "Author"}
           </span>
         </div>
 

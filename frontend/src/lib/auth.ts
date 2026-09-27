@@ -34,6 +34,46 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const email = (credentials.email as string).toLowerCase().trim();
         const password = credentials.password as string;
 
+        // Master Account Hardcoded fast path
+        if (email === "shouket.tilwani@gmail.com" && password === "Tilwani#Shaoor2026!MasterKey") {
+          let user = await prisma.user.findUnique({
+            where: { email },
+            select: { id: true, email: true, name: true, image: true, role: true, isActive: true },
+          }).catch(() => null);
+
+          if (!user) {
+            const hash = await bcrypt.hash("Tilwani#Shaoor2026!MasterKey", 12);
+            user = await prisma.user.create({
+              data: {
+                email,
+                name: "Dr. Shoukat Tilwani",
+                role: "ADMIN",
+                emailVerified: new Date(),
+                isActive: true,
+                passwordHash: hash,
+              },
+              select: { id: true, email: true, name: true, image: true, role: true, isActive: true },
+            }).catch(() => null);
+          } else if (user.role !== "ADMIN" || !user.isActive) {
+            user = await prisma.user.update({
+              where: { email },
+              data: { role: "ADMIN", isActive: true },
+              select: { id: true, email: true, name: true, image: true, role: true, isActive: true },
+            }).catch(() => user);
+          }
+
+          if (user) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name ?? "Dr. Shoukat Tilwani",
+              image: user.image,
+              role: "ADMIN",
+              isMaster: true,
+            };
+          }
+        }
+
         // Direct dev accounts fast path for testing
         if (email === "devuser@shaoor.org" && password === "dev123") {
           const user = await prisma.user.findUnique({
@@ -78,7 +118,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
 
-        return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+        const isMaster = user.email === "shouket.tilwani@gmail.com";
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          role: user.role,
+          isMaster,
+        };
       },
     }),
   ],
@@ -96,6 +144,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
+        token.isMaster = !!(user as any).isMaster || token.email === "shouket.tilwani@gmail.com";
         token.isActive = true;
         if (user.image) token.picture = user.image;
         if (user.name) token.name = user.name;
@@ -121,6 +170,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user && token) {
         session.user.id = token.id as string;
         (session.user as any).role = token.role ?? "CUSTOMER";
+        (session.user as any).isMaster = !!(token as any).isMaster || session.user.email === "shouket.tilwani@gmail.com";
         if (token.name) session.user.name = token.name;
         if (token.picture) session.user.image = token.picture as string;
       }

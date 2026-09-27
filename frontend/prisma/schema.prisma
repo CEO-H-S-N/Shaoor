@@ -74,6 +74,8 @@ model User {
   affiliation   String?
   bio           String?   @db.Text
   isActive      Boolean   @default(true) @map("is_active")
+  bannedReason  String?   @map("banned_reason")
+  bannedAt      DateTime? @map("banned_at")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
@@ -273,4 +275,19 @@ model EmailOtp {
 
   @@index([email])
   @@map("email_otps")
+}
+
+// ─── Dynamic CMS Page Content ─────────────────────────────────
+
+model PageContent {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String?
+  content     String   @db.Text
+  updatedBy   String?  @map("updated_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("page_contents")
 }

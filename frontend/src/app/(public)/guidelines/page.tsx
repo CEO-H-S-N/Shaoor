@@ -4,42 +4,43 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { DEFAULT_ABOUT_CONTENT, PageSection } from "@/lib/pageContentDefaults";
+import { DEFAULT_GUIDELINES_CONTENT, PageSection } from "@/lib/pageContentDefaults";
 import {
   BookOpen,
-  ShieldCheck,
-  CheckCircle2,
+  FileText,
   FileEdit,
   Send,
   ScrollText,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
-  title: "About — Shaoor",
+  title: "Author Guidelines — Shaoor",
   description:
-    "Learn about Shaoor, an open-access international academic publishing platform committed to rigorous peer review and transparent scholarship.",
+    "Comprehensive criteria, formatting instructions, and ethical standards for submitting scholarly manuscripts to Shaoor Academic Journal.",
 };
 
-export default async function AboutPage() {
+export default async function GuidelinesPage() {
   const session = await auth();
   const isAdmin =
     session?.user &&
     ["ADMIN", "DESIGNER"].includes((session.user as any)?.role);
 
   const page = await prisma.pageContent.findUnique({
-    where: { slug: "about" },
+    where: { slug: "author-guidelines" },
   });
 
-  const title = page?.title ?? DEFAULT_ABOUT_CONTENT.title;
-  const subtitle = page?.subtitle ?? DEFAULT_ABOUT_CONTENT.subtitle;
+  const title = page?.title ?? DEFAULT_GUIDELINES_CONTENT.title;
+  const subtitle = page?.subtitle ?? DEFAULT_GUIDELINES_CONTENT.subtitle;
 
-  let sections: PageSection[] = DEFAULT_ABOUT_CONTENT.sections;
+  let sections: PageSection[] = DEFAULT_GUIDELINES_CONTENT.sections;
   if (page) {
     try {
       sections = JSON.parse(page.content);
     } catch {
-      // Fallback to default
+      // Fallback
     }
   }
 
@@ -51,33 +52,35 @@ export default async function AboutPage() {
         <section className={styles.hero}>
           <div className={styles.heroInner}>
             <div className={styles.badge}>
-              <BookOpen size={13} />
-              Open-Access Scholarly Journal
+              <ScrollText size={13} />
+              Editorial Submission Standards
             </div>
             <h1 className={styles.title}>{title}</h1>
             <p className={styles.subtitle}>{subtitle}</p>
 
             {isAdmin && (
               <div style={{ marginTop: "16px" }}>
-                <Link href="/admin/edit-about" className={styles.adminEditBadge}>
+                <Link href="/admin/edit-guidelines" className={styles.adminEditBadge}>
                   <FileEdit size={13} />
-                  Edit About Page (Admin)
+                  Edit Author Guidelines (Admin)
                 </Link>
               </div>
             )}
           </div>
         </section>
 
-        {/* ── Dynamic Content Sections ──────────────────────── */}
+        {/* ── Content Sections ───────────────────────────────── */}
         <div className={styles.container}>
           {sections.map((section, idx) => (
             <article key={section.id || idx} className={styles.sectionCard}>
               <div className={styles.sectionHeader}>
                 <div className={styles.sectionIcon}>
-                  {idx % 3 === 0 ? (
+                  {idx === 0 ? (
+                    <FileText size={16} />
+                  ) : idx === 1 ? (
                     <BookOpen size={16} />
-                  ) : idx % 3 === 1 ? (
-                    <ShieldCheck size={16} />
+                  ) : idx === 3 ? (
+                    <AlertTriangle size={16} />
                   ) : (
                     <CheckCircle2 size={16} />
                   )}
@@ -102,18 +105,14 @@ export default async function AboutPage() {
 
           {/* ── Call to Action Card ───────────────────────────── */}
           <div className={styles.ctaCard}>
-            <h2 className={styles.ctaTitle}>Ready to Disseminate Your Research?</h2>
+            <h2 className={styles.ctaTitle}>Ready to Submit Your Manuscript?</h2>
             <p className={styles.ctaDesc}>
-              Submit your original paper for double-blind peer review. Authors retain copyright with permanent open-access preservation.
+              Follow the preparation instructions above and submit your paper via our streamlined 5-stage editorial wizard.
             </p>
             <div className={styles.ctaActions}>
               <Link href="/submit" className={styles.ctaBtnPrimary}>
                 <Send size={15} />
-                Submit Manuscript
-              </Link>
-              <Link href="/guidelines" className={styles.ctaBtnSecondary}>
-                <ScrollText size={15} />
-                Read Author Guidelines
+                Proceed to Manuscript Submission
               </Link>
             </div>
           </div>

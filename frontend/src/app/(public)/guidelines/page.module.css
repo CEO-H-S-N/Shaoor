@@ -178,22 +178,3 @@
   background: #f8fafc;
   transform: translateY(-1px);
 }
-
-.ctaBtnSecondary {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 22px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  text-decoration: none;
-  transition: all 150ms ease;
-}
-
-.ctaBtnSecondary:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
