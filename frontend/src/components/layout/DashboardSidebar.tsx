@@ -13,6 +13,7 @@ import {
   BookOpenCheck,
   ShieldCheck,
   Crown,
+  UserCheck,
 } from "lucide-react";
 import styles from "@/app/(dashboard)/layout.module.css";
 
@@ -21,16 +22,18 @@ interface NavItem {
   label: string;
   icon: React.ElementType;
   roles: Array<"CUSTOMER" | "ADMIN" | "DESIGNER">;
+  ownerOnly?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/my-papers", label: "My Papers", icon: FileText, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
   { href: "/submit", label: "Submit Paper", icon: Send, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
   { href: "/review", label: "Review Queue", icon: ClipboardList, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-team", label: "Edit Our Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
 ];
 
 interface Props {
@@ -41,7 +44,9 @@ interface Props {
 export function DashboardSidebar({ role, isMaster }: Props) {
   const pathname = usePathname();
 
-  const visibleMain = NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const visibleMain = NAV_ITEMS.filter(
+    (item) => item.roles.includes(role) && (!item.ownerOnly || isMaster)
+  );
 
   function navLink(item: NavItem) {
     const isActive = pathname === item.href || pathname.startsWith(item.href + "/");

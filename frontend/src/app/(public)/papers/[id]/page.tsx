@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PaperActions, CopyCitationButton } from "./PaperActions";
+import { EditorialTopBanner, EditorialBottomSection } from "./EditorialDecisionSection";
 import styles from "./page.module.css";
 
 // ── Demo paper store — fallback ──────────────────────────────
@@ -45,6 +46,11 @@ const PAPERS: Record<string, {
     fileUrl: string;
     fileName?: string | null;
   }>;
+  status: string;
+  decisionMessage?: string | null;
+  decisionBy?: string | null;
+  decisionAt?: string | null;
+  authorId?: string;
 }> = {
   p1: {
     id: "p1",
@@ -70,6 +76,11 @@ These results suggest that integrating multi-modal imaging with structured bioma
     doi: "10.xxxx/shaoor.2026.0001",
     version: 2,
     figures: [],
+    status: "PUBLISHED",
+    decisionMessage: null,
+    decisionBy: null,
+    decisionAt: null,
+    authorId: "demo-user-1",
   },
   p2: {
     id: "p2",
@@ -94,6 +105,11 @@ We propose a hybrid migration roadmap for cloud providers, combining classical E
     doi: "10.xxxx/shaoor.2026.0002",
     version: 1,
     figures: [],
+    status: "PUBLISHED",
+    decisionMessage: null,
+    decisionBy: null,
+    decisionAt: null,
+    authorId: "demo-user-2",
   },
 };
 
@@ -104,7 +120,7 @@ async function getPaper(id: string) {
     const db = await prisma.paper.findUnique({
       where: { id },
       include: {
-        author: { select: { name: true, affiliation: true, email: true } },
+        author: { select: { id: true, name: true, affiliation: true, email: true } },
         category: { select: { name: true } },
         figures: { orderBy: { figureNumber: "asc" } },
       },
@@ -141,6 +157,11 @@ async function getPaper(id: string) {
         fileUrl: f.fileUrl,
         fileName: f.fileName,
       })),
+      status: db.status,
+      decisionMessage: db.decisionMessage,
+      decisionBy: db.decisionBy,
+      decisionAt: db.decisionAt ? db.decisionAt.toISOString() : null,
+      authorId: db.authorId,
     };
   } catch {
     return null;
@@ -196,13 +217,36 @@ export default async function PaperDetailPage({ params }: Props) {
         Back to Papers
       </Link>
 
+      {/* ── Editorial Review Alert Banner (if reviewed) ────── */}
+      <EditorialTopBanner
+        paperId={paper.id}
+        initialStatus={paper.status}
+        decisionMessage={paper.decisionMessage ?? null}
+        decisionBy={paper.decisionBy ?? null}
+      />
+
       {/* ── Paper Header ───────────────────────────────────── */}
       <header className={styles.paperHeader}>
         <div className={styles.meta}>
-          <span className={`${styles.badge} ${styles.badgePublished}`}>
-            <BookOpen size={10} />
-            Published
-          </span>
+          {paper.status === "PUBLISHED" ? (
+            <span className={`${styles.badge} ${styles.badgePublished}`}>
+              <BookOpen size={10} />
+              Published
+            </span>
+          ) : paper.status === "ACCEPTED" ? (
+            <span className={`${styles.badge} ${styles.badgePublished}`} style={{ background: "#ecfdf5", color: "#047857" }}>
+              <BookOpen size={10} />
+              Accepted
+            </span>
+          ) : paper.status === "REJECTED" ? (
+            <span className={`${styles.badge}`} style={{ background: "#fef2f2", color: "#b91c1c", border: "1px solid #fecaca" }}>
+              Revision Required / Denied
+            </span>
+          ) : (
+            <span className={`${styles.badge}`} style={{ background: "#eff6ff", color: "#1d4ed8" }}>
+              {paper.status === "UNDER_REVIEW" ? "Under Peer Review" : "Submitted"}
+            </span>
+          )}
           <span className={`${styles.badge} ${styles.badgeCategory}`}>{paper.category}</span>
           {paper.doi && (
             <span style={{ fontSize: "var(--text-xs)", color: "var(--color-neutral-400)" }}>
@@ -324,6 +368,17 @@ export default async function PaperDetailPage({ params }: Props) {
               </div>
             </section>
           )}
+
+          {/* ── Editorial Review & Decision Section ── */}
+          <EditorialBottomSection
+            paperId={paper.id}
+            paperTitle={paper.title}
+            initialStatus={paper.status}
+            decisionMessage={paper.decisionMessage ?? null}
+            decisionBy={paper.decisionBy ?? null}
+            decisionAt={paper.decisionAt ?? null}
+            authorId={paper.authorId}
+          />
         </main>
 
         {/* Sidebar */}

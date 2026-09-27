@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { LoginButtons } from "./LoginButtons";
@@ -34,8 +35,10 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Auth form + OAuth */}
-        <LoginButtons />
+        {/* Auth form + OAuth — Suspense needed for useSearchParams */}
+        <Suspense fallback={<div style={{ height: 200 }} />}>
+          <LoginButtons />
+        </Suspense>
 
         {/* Footer */}
         <p className={styles.terms}>

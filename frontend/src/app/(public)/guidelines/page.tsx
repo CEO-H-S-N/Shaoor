@@ -24,9 +24,8 @@ export const metadata: Metadata = {
 
 export default async function GuidelinesPage() {
   const session = await auth();
-  const isAdmin =
-    session?.user &&
-    ["ADMIN", "DESIGNER"].includes((session.user as any)?.role);
+  const isOwner =
+    !!(session?.user as any)?.isMaster || session?.user?.email === "shouket.tilwani@gmail.com";
 
   const page = await prisma.pageContent.findUnique({
     where: { slug: "author-guidelines" },
@@ -58,11 +57,11 @@ export default async function GuidelinesPage() {
             <h1 className={styles.title}>{title}</h1>
             <p className={styles.subtitle}>{subtitle}</p>
 
-            {isAdmin && (
+            {isOwner && (
               <div style={{ marginTop: "16px" }}>
                 <Link href="/admin/edit-guidelines" className={styles.adminEditBadge}>
                   <FileEdit size={13} />
-                  Edit Author Guidelines (Admin)
+                  Edit Author Guidelines (Owner)
                 </Link>
               </div>
             )}

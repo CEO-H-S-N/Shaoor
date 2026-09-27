@@ -3,7 +3,8 @@
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
-import { UserPlus } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { UserPlus, CheckCircle2 } from "lucide-react";
 import styles from "./page.module.css";
 
 export function LoginButtons() {
@@ -11,6 +12,9 @@ export function LoginButtons() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const params = useSearchParams();
+  const justVerified = params?.get("verified") === "1";
+  const justReset = params?.get("reset") === "1";
 
   async function handleGoogleSignIn() {
     setLoading(true);
@@ -21,14 +25,10 @@ export function LoginButtons() {
     }
   }
 
-  async function handleCredentialsSignIn(
-    e?: React.FormEvent,
-    directEmail?: string,
-    directPassword?: string
-  ) {
+  async function handleCredentialsSignIn(e?: React.FormEvent) {
     if (e) e.preventDefault();
-    const activeEmail = (directEmail || email).trim().toLowerCase();
-    const activePassword = directPassword || password;
+    const activeEmail = email.trim().toLowerCase();
+    const activePassword = password;
 
     if (!activeEmail || !activePassword) {
       setError("Please enter both email and password.");
@@ -51,7 +51,7 @@ export function LoginButtons() {
       });
 
       if (res?.error) {
-        setError("Invalid email or password, or email not verified.");
+        setError("Invalid email or password, or your email is not yet verified.");
         setLoading(false);
       } else {
         window.location.href = targetUrl;
@@ -62,14 +62,22 @@ export function LoginButtons() {
     }
   }
 
-  function fillAndSubmit(userEmail: string, userPass: string) {
-    setEmail(userEmail);
-    setPassword(userPass);
-    handleCredentialsSignIn(undefined, userEmail, userPass);
-  }
-
   return (
     <div className={styles.oauthSection}>
+      {/* Success banners after verify/reset */}
+      {justVerified && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, color: "#166534", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+          <CheckCircle2 size={16} />
+          Email verified! You can now sign in.
+        </div>
+      )}
+      {justReset && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 8, color: "#166534", fontSize: 13, fontWeight: 600, marginBottom: 4 }}>
+          <CheckCircle2 size={16} />
+          Password reset successfully! Sign in with your new password.
+        </div>
+      )}
+
       {/* ─── Email / Password Form ───────────────────── */}
       <form onSubmit={handleCredentialsSignIn} className={styles.credentialsForm} noValidate>
         <input
@@ -93,6 +101,16 @@ export function LoginButtons() {
           required
         />
 
+        <div style={{ textAlign: "right", marginTop: -4 }}>
+          <Link
+            href="/forgot-password"
+            style={{ fontSize: 13, color: "#1e3a8a", textDecoration: "none", fontWeight: 600 }}
+            id="login-forgot-password"
+          >
+            Forgot password?
+          </Link>
+        </div>
+
         {error && (
           <div className={styles.loginError} role="alert">
             {error}
@@ -107,38 +125,6 @@ export function LoginButtons() {
         >
           {loading ? "Signing in…" : "Sign in"}
         </button>
-
-        {/* Dev quick-fill */}
-        <div className={styles.quickFillRow}>
-          <span style={{ fontWeight: 600 }}>Quick fill:</span>
-          <button
-            type="button"
-            className={styles.quickFillBtn}
-            onClick={() => fillAndSubmit("shouket.tilwani@gmail.com", "Tilwani#Shaoor2026!MasterKey")}
-            disabled={loading}
-            id="quick-fill-owner"
-          >
-            👑 Owner
-          </button>
-          <button
-            type="button"
-            className={styles.quickFillBtn}
-            onClick={() => fillAndSubmit("devadmin@shaoor.org", "dev123")}
-            disabled={loading}
-            id="quick-fill-admin"
-          >
-            🛡️ Admin
-          </button>
-          <button
-            type="button"
-            className={styles.quickFillBtn}
-            onClick={() => fillAndSubmit("devuser@shaoor.org", "dev123")}
-            disabled={loading}
-            id="quick-fill-user"
-          >
-            👤 Author
-          </button>
-        </div>
       </form>
 
       {/* ─── Divider ─────────────────────────────────── */}

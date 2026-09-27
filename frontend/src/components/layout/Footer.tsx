@@ -35,6 +35,7 @@ export function Footer() {
               <li><Link href="/submit">Submit a Paper</Link></li>
               <li><Link href="/about">About Shaoor</Link></li>
               <li><Link href="/guidelines">Author Guidelines</Link></li>
+              <li><Link href="/team">Our Team &amp; Editorial Board</Link></li>
             </ul>
           </div>
 

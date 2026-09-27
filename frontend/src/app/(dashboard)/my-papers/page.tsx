@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { FileText, Plus, Clock, CheckCircle, AlertCircle, Eye, FileType } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ResubmitButton } from "./ResubmitButton";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -187,6 +188,16 @@ export default async function MyPapersPage() {
                       )}
                     </div>
                   )}
+
+                  {/* Reviewer Feedback / Decision Callout */}
+                  {paper.decisionMessage && (
+                    <div className={styles.decisionBanner}>
+                      <span className={styles.decisionLabel}>
+                        Reviewer Feedback ({paper.decisionBy || "Editorial Board"}):
+                      </span>
+                      <p className={styles.decisionText}>"{paper.decisionMessage}"</p>
+                    </div>
+                  )}
                 </div>
 
                 <div className={styles.paperActions}>
@@ -205,10 +216,18 @@ export default async function MyPapersPage() {
                       <Button variant="outline" size="sm">Revise</Button>
                     </Link>
                   )}
-                  {["SUBMITTED", "UNDER_REVIEW", "ACCEPTED", "REJECTED"].includes(paper.status) && (
+                  {["SUBMITTED", "UNDER_REVIEW", "ACCEPTED"].includes(paper.status) && (
                     <Link href={`/papers/${paper.id}`}>
                       <Button variant="ghost" size="sm">View</Button>
                     </Link>
+                  )}
+                  {paper.status === "REJECTED" && (
+                    <>
+                      <Link href={`/papers/${paper.id}`}>
+                        <Button variant="secondary" size="sm">View Feedback</Button>
+                      </Link>
+                      <ResubmitButton paperId={paper.id} />
+                    </>
                   )}
                 </div>
               </article>

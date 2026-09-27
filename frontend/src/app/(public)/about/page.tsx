@@ -23,9 +23,8 @@ export const metadata: Metadata = {
 
 export default async function AboutPage() {
   const session = await auth();
-  const isAdmin =
-    session?.user &&
-    ["ADMIN", "DESIGNER"].includes((session.user as any)?.role);
+  const isOwner =
+    !!(session?.user as any)?.isMaster || session?.user?.email === "shouket.tilwani@gmail.com";
 
   const page = await prisma.pageContent.findUnique({
     where: { slug: "about" },
@@ -57,11 +56,11 @@ export default async function AboutPage() {
             <h1 className={styles.title}>{title}</h1>
             <p className={styles.subtitle}>{subtitle}</p>
 
-            {isAdmin && (
+            {isOwner && (
               <div style={{ marginTop: "16px" }}>
                 <Link href="/admin/edit-about" className={styles.adminEditBadge}>
                   <FileEdit size={13} />
-                  Edit About Page (Admin)
+                  Edit About Page (Owner)
                 </Link>
               </div>
             )}

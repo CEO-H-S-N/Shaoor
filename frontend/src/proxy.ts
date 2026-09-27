@@ -18,7 +18,7 @@ import { authConfig } from "@/lib/auth.config";
 const { auth } = NextAuth(authConfig);
 
 // ─── Route Definitions ────────────────────────────────────────
-const PUBLIC_ROUTES = ["/", "/papers", "/about", "/guidelines", "/contact", "/faq"];
+const PUBLIC_ROUTES = ["/", "/papers", "/about", "/guidelines", "/team", "/contact", "/faq"];
 const AUTH_ROUTES = ["/login"];
 const PROTECTED_ROUTES = ["/submit", "/my-papers", "/settings", "/notifications"];
 const ADMIN_ROUTES = ["/review", "/admin"];

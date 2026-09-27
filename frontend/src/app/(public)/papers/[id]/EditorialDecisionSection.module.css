@@ -1,0 +1,339 @@
+/* ═══════════════════════════════════════════════════════════════
+   Editorial Decision Section & Notification Banner
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Top notification banner on the paper */
+.paperAlertBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 1px solid;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.bannerRejected {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.bannerAccepted {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.bannerSubmitted {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+.bannerLeft {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.bannerIconWrap {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bannerTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.bannerSubtitle {
+  font-size: 13px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+
+.bannerActionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid currentColor;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.bannerActionBtn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Section at the bottom of the paper ────────────────────── */
+.section {
+  margin-top: 40px;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 24px;
+}
+
+.sectionTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sectionIconBadge {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #0f172a;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.sectionSubtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 2px 0 0 0;
+}
+
+/* Status Pill */
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pillRejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.pillAccepted {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.pillSubmitted {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+/* Decision Details Card */
+.detailsCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metaLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.05em;
+}
+
+.metaValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* Feedback Message Box */
+.messageBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.messageHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.messageContent {
+  padding: 16px 20px;
+  background: #ffffff;
+  border-left: 4px solid #ef4444;
+  border-top: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 0 8px 8px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #1e293b;
+  white-space: pre-wrap;
+}
+
+.messageContentAccepted {
+  border-left-color: #22c55e;
+}
+
+/* Resubmission Action Box */
+.resubmitBox {
+  background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%);
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.resubmitInfo {
+  max-width: 580px;
+}
+
+.resubmitTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.resubmitDesc {
+  font-size: 13px;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.resubmitBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.resubmitBtn:hover:not(:disabled) {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.25);
+}
+
+.resubmitBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.resubmitSuccess {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 8px;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 20px;
+  }
+  .resubmitBox {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .resubmitBtn {
+    width: 100%;
+    justify-content: center;
+  }
+  .paperAlertBanner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

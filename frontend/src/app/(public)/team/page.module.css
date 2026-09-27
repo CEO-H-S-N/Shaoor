@@ -1,0 +1,167 @@
+.page {
+  min-height: calc(100vh - var(--header-height));
+  background: #f8fafc;
+  padding-bottom: 80px;
+}
+
+.hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 56px 24px 44px 24px;
+  text-align: center;
+}
+
+.heroInner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin: 0 0 16px 0;
+}
+
+.subtitle {
+  font-size: 1.0625rem;
+  color: #475569;
+  line-height: 1.6;
+  margin: 0 auto;
+  max-width: 740px;
+}
+
+.adminEditBadge {
+  margin-top: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 150ms ease;
+}
+
+.adminEditBadge:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.container {
+  max-width: 1040px;
+  margin: 40px auto 0 auto;
+  padding: 0 24px;
+}
+
+.teamGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 24px;
+}
+
+.memberCard {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
+  display: flex;
+  flex-direction: column;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.memberCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1e3a8a;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.125rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 2px solid #e2e8f0;
+}
+
+.memberMeta {
+  flex: 1;
+}
+
+.memberName {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.designationBadge {
+  display: inline-block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #1e40af;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  margin-top: 4px;
+}
+
+.institution {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.summary {
+  font-size: 0.8125rem;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0;
+  flex: 1;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 24px;
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #64748b;
+}

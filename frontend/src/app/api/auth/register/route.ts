@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
-import nodemailer from "nodemailer";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import pg from "pg";
+import { sendOtpEmail } from "@/lib/email";
 
 const RegisterSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,69 +29,6 @@ function getPrisma() {
 
 function generateOtp(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
-}
-
-async function sendOtpEmail(email: string, otp: string, name: string) {
-  const emailFrom = process.env.EMAIL_FROM;
-  const emailPass = process.env.EMAIL_APP_PASSWORD;
-
-  const isConfigured =
-    emailFrom &&
-    emailPass &&
-    !emailFrom.includes("your-gmail") &&
-    !emailPass.includes("your-16-char");
-
-  if (!isConfigured) {
-    console.log(`\n========================================`);
-    console.log(`[DEV OTP SIMULATION - EMAIL NOT CONFIGURED]`);
-    console.log(`To: ${email} (${name})`);
-    console.log(`OTP Code: ${otp}`);
-    console.log(`Configure EMAIL_FROM & EMAIL_APP_PASSWORD in .env.local to send real emails.`);
-    console.log(`========================================\n`);
-    return;
-  }
-
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: emailFrom,
-        pass: emailPass,
-      },
-    });
-
-    await transporter.sendMail({
-      from: `"Shaoor Platform" <${emailFrom}>`,
-      to: email,
-      subject: "Verify your Shaoor account",
-      html: `
-        <div style="font-family: Inter, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #ffffff;">
-          <div style="text-align: center; margin-bottom: 32px;">
-            <h1 style="font-size: 24px; font-weight: 700; color: #18181b; margin: 0;">Shaoor</h1>
-            <p style="font-size: 13px; color: #71717a; margin-top: 4px;">Academic Publishing Platform</p>
-          </div>
-          <h2 style="font-size: 20px; font-weight: 600; color: #111827; margin-bottom: 8px;">Welcome, ${name}!</h2>
-          <p style="color: #374151; margin-bottom: 24px; line-height: 1.6;">
-            Use the verification code below to confirm your email address and activate your Shaoor account. 
-            This code expires in <strong>15 minutes</strong>.
-          </p>
-          <div style="background: #f4f4f5; border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-            <div style="font-size: 40px; font-weight: 800; letter-spacing: 12px; color: #18181b; font-family: monospace;">${otp}</div>
-          </div>
-          <p style="font-size: 13px; color: #9ca3af; line-height: 1.5;">
-            If you did not create a Shaoor account, you can safely ignore this email.
-          </p>
-        </div>
-      `,
-    });
-  } catch (smtpErr) {
-    console.warn("[SMTP Warning] Could not send email via Gmail:", smtpErr);
-    console.log(`\n========================================`);
-    console.log(`[FALLBACK OTP CODE]`);
-    console.log(`To: ${email}`);
-    console.log(`OTP Code: ${otp}`);
-    console.log(`========================================\n`);
-  }
 }
 
 export async function POST(req: NextRequest) {
@@ -140,14 +77,14 @@ export async function POST(req: NextRequest) {
         username,
         affiliation: institution,
         passwordHash,
-        emailVerified: null, // not verified yet
-        isActive: false,     // activate after verification
+        emailVerified: null,
+        isActive: false,
       },
     });
 
     // Generate and store OTP
     const otp = generateOtp();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     // Invalidate any previous OTPs for this email
     await prisma.emailOtp.updateMany({
@@ -162,9 +99,9 @@ export async function POST(req: NextRequest) {
     await prisma.$disconnect();
 
     // Send OTP email
-    await sendOtpEmail(email, otp, name);
+    const { previewUrl } = await sendOtpEmail({ to: email, name, otp, purpose: "signup" });
 
-    return NextResponse.json({ success: true, email });
+    return NextResponse.json({ success: true, email, previewUrl });
   } catch (err) {
     console.error("[/api/auth/register]", err);
     return NextResponse.json(
