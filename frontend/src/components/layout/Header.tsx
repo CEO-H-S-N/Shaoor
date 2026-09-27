@@ -76,15 +76,28 @@ export function Header() {
                 {dashboardLabel}
               </Link>
 
-              <div className={styles.userBadge}>
-                <div className={styles.userInitial}>
-                  {user?.name ? user.name[0].toUpperCase() : "U"}
-                </div>
+              <Link
+                href="/settings"
+                className={styles.userBadge}
+                id="header-user-badge"
+                title="Account Settings"
+              >
+                {user?.image ? (
+                  <img
+                    src={user.image}
+                    alt={user.name || "User"}
+                    className={styles.userAvatarImg}
+                  />
+                ) : (
+                  <div className={styles.userInitial}>
+                    {user?.name ? user.name[0].toUpperCase() : "U"}
+                  </div>
+                )}
                 <span className={styles.userName}>{user?.name || user?.email}</span>
                 {role && role !== "CUSTOMER" && (
                   <span className={styles.userRoleBadge}>{role}</span>
                 )}
-              </div>
+              </Link>
 
               <button
                 type="button"
@@ -133,6 +146,14 @@ export function Header() {
               >
                 <LayoutDashboard size={15} />
                 {dashboardLabel}
+              </Link>
+              <Link
+                href="/settings"
+                onClick={() => setMobileMenuOpen(false)}
+                className={styles.settingsLink}
+                style={{ justifyContent: "center" }}
+              >
+                Account Settings
               </Link>
               <button
                 type="button"

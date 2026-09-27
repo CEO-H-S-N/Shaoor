@@ -110,6 +110,8 @@ model Paper {
   fileName    String?     @map("file_name")
   fileSize    Int?        @map("file_size")
   version     Int         @default(1)
+  viewCount   Int         @default(0) @map("view_count")
+  downloadCount Int       @default(0) @map("download_count")
   authorId    String      @map("author_id")
   submittedAt DateTime?   @map("submitted_at")
   publishedAt DateTime?   @map("published_at")
@@ -117,16 +119,35 @@ model Paper {
   updatedAt   DateTime    @updatedAt @map("updated_at")
 
   // Relations
+  // Relations
   author   User           @relation("AuthorPapers", fields: [authorId], references: [id])
   category Category?      @relation(fields: [categoryId], references: [id])
   reviews  Review[]
   versions PaperVersion[]
+  figures  PaperFigure[]
 
   @@index([authorId])
   @@index([status])
   @@index([categoryId])
   @@index([createdAt(sort: Desc)])
   @@map("papers")
+}
+
+model PaperFigure {
+  id           String   @id @default(cuid())
+  paperId      String   @map("paper_id")
+  figureNumber Int      @map("figure_number")
+  title        String
+  caption      String?  @db.Text
+  fileUrl      String   @map("file_url")
+  fileName     String   @map("file_name")
+  fileSize     Int?     @map("file_size")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@index([paperId])
+  @@map("paper_figures")
 }
 
 model PaperVersion {

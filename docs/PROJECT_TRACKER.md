@@ -168,6 +168,75 @@
 
 ---
 
+### Phase 4.6: User Account Settings & Profile Customization ✅ COMPLETED
+- [x] **Minimalist Account Settings Page (`/settings`)**:
+  - Server Component querying live Prisma user profile with authored paper and review counts.
+  - Responsive two-column layout: interactive configuration on the left, sticky **Live Identity Preview Card** & **Academic Portfolio** stats on the right.
+  - Breadcrumb navigation (`Dashboard / Account Settings`) and consistent slate/navy design tokens.
+- [x] **Profile Picture (PFP) Management**:
+  - Upload custom photo with client-side center-square crop (1:1) and high-quality WebP/JPEG compression to lightweight data URI.
+  - 6 handcrafted academic vector avatar presets (*Indigo Scholar*, *Emerald Bio*, *Violet Physics*, *Amber Cosmos*, *Slate Math*, *Cyan Systems*) for users preferring scholarly motifs over personal photos.
+  - Single-click remove/reset photo action.
+- [x] **Academic Profile & Identity Fields**:
+  - Full Name (required, updates authorship records).
+  - Unique Username / Handle with `@` prefix formatting and regex validation.
+  - Read-only Email Address with Verified Lock badge to secure publication provenance.
+  - Institutional Affiliation / University.
+  - ORCID iD with 16-digit auto-hyphenation formatting (`0000-0000-0000-0000`) and live verification link.
+  - Research Bio & Interests textarea with character counter (up to 2,000 chars).
+- [x] **Profile API (`/api/user/profile`)**:
+  - `GET` and `PATCH` endpoints with Zod schema validation.
+  - Uniqueness validation for `username` and `orcidId` preventing account collisions.
+  - Integrated with OWASP A09 Audit Logging (`prisma.auditLog.create`).
+- [x] **Real-Time Session Synchronization**:
+  - Extended NextAuth JWT and session callbacks (`auth.ts` and `auth.config.ts`) to support `trigger: "update"`.
+  - Calling `update({ name, image })` instantly synchronizes the browser session, immediately updating the top-right Header user badge and avatar across the application without requiring a page refresh.
+  - Header user badge upgraded to display custom avatars or fallback initials and acts as an instant shortcut to `/settings`.
+
+---
+
+### Phase 4.7: Manuscript Submission Portal Redesign & Scientific Figures System ✅ COMPLETED
+- [x] **Frontiers/Nature-Inspired Editorial Redesign (`/submit`)**:
+  - Replaced generic minimal layout with an authoritative, 5-stage academic peer-review submission workspace (`Metadata → Manuscript → Figures → Declarations → Review & Submit`).
+  - Sleek deep navy (`#1e3a8a`) and slate design language with high contrast, responsive two-column grid, and double-blind peer review compliance badge.
+  - Sticky right-column **Submission Readiness Pre-Flight Checklist** providing real-time validation across title, category, word count, keywords, manuscript, figures, and signed ethics.
+- [x] **High-Resolution Figures & Illustrations Studio**:
+  - First-class database support via new `PaperFigure` model on AWS RDS PostgreSQL.
+  - Interactive figure management: upload standalone charts, microscopy, diagrams, architectures, or plots (PNG, JPG, WEBP, SVG, TIFF, PDF).
+  - Authors specify Figure Number, Figure Title, and extended Legends/statistical descriptions.
+  - Client-side image processing for instant thumbnail generation and inspection before submission.
+  - Full support for adding, editing captions, reordering, and deleting figures.
+  - Figures are surfaced in both the pre-submission dossier and public paper detail pages (`/papers/[id]`).
+- [x] **Native Full-Stack Submission Pipeline (`/api/papers` & `/api/upload`)**:
+  - Replaced external/broken Lambda cross-origin calls with a native Next.js API route (`/api/papers`) creating paper records, relations, and figures directly in RDS PostgreSQL.
+  - Upgraded S3 pre-signed upload route (`/api/upload`) to support high-res scientific figures alongside manuscripts.
+  - Supports both **"Save as Draft"** (resumable later in My Papers) and **"Submit for Peer Review"**.
+  - Celebratory confirmation screen featuring auto-generated Reference ID (`SHR-2026-XXXX`), submission timestamp, and 3-stage editorial progress tracker.
+
+---
+
+### Phase 4.8: Live Paper Analytics, PDF Download, & Social Share System ✅ COMPLETED
+- [x] **Live Views & Downloads Metrics Engine**:
+  - Added `downloadCount` (`download_count`) to `Paper` model and ensured synchronization with `viewCount` on AWS RDS PostgreSQL.
+  - Created high-performance Next.js API routes:
+    - `/api/papers/[id]/view`: `POST` atomically increments `viewCount`; `GET` returns current views and downloads.
+    - `/api/papers/[id]/download`: `POST` atomically increments `downloadCount`.
+  - Client-side `sessionStorage` deduplication in `PaperActions.tsx` ensures reader visits are counted accurately without spamming on re-renders.
+  - Live metric indicators update in real-time on the paper details page.
+- [x] **Universal PDF Download Pipeline**:
+  - Download PDF button triggers download tracking API and serves manuscript file with appropriate download attribute.
+  - Intelligent fallback for manuscripts without an uploaded binary: generates a printable academic document view and opens browser print/save-as-PDF dialog.
+- [x] **Scholarly Share & Citation Modal**:
+  - Glassmorphic modal accessible from the "Share" action button on `/papers/[id]`.
+  - **Permanent Link Copy**: One-click copy with instant visual checkmark and feedback toast.
+  - **Multi-Platform Sharing**: Direct web share integration with pre-formatted title and URL for X (Twitter), LinkedIn, WhatsApp, and scholarly Email.
+  - **Quick Citation Export**: Integrated APA-formatted citation preview with single-click copy to clipboard.
+- [x] **Scientific Figures Gallery on Paper Detail View**:
+  - Connected `figures` relation in `getPaper(id)` to load attached figures from AWS RDS PostgreSQL.
+  - Figures section rendered below abstract with zoomable figure cards, high-contrast badges (`Fig. 1`, `Fig. 2`), titles, and detailed captions.
+
+---
+
 ### Phase 5: Testing & Hardening (Planned)
 - [ ] Unit tests (Vitest) — 80%+ coverage target
 - [ ] E2E tests (Playwright) — critical flows

@@ -15,11 +15,13 @@ import {
   Mail,
   ExternalLink,
   ArrowLeft,
+  Image as ImageIcon,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { prisma } from "@/lib/prisma";
+import { PaperActions, CopyCitationButton } from "./PaperActions";
 import styles from "./page.module.css";
 
-// ── Demo paper store — will be Prisma queries ────────────────
+// ── Demo paper store — fallback ──────────────────────────────
 const PAPERS: Record<string, {
   id: string;
   title: string;
@@ -33,6 +35,16 @@ const PAPERS: Record<string, {
   downloads: number;
   doi?: string;
   version: number;
+  fileUrl?: string | null;
+  fileName?: string | null;
+  figures?: Array<{
+    id: string;
+    figureNumber: number;
+    title: string;
+    caption?: string | null;
+    fileUrl: string;
+    fileName?: string | null;
+  }>;
 }> = {
   p1: {
     id: "p1",
@@ -57,6 +69,7 @@ These results suggest that integrating multi-modal imaging with structured bioma
     downloads: 318,
     doi: "10.xxxx/shaoor.2026.0001",
     version: 2,
+    figures: [],
   },
   p2: {
     id: "p2",
@@ -80,15 +93,67 @@ We propose a hybrid migration roadmap for cloud providers, combining classical E
     downloads: 201,
     doi: "10.xxxx/shaoor.2026.0002",
     version: 1,
+    figures: [],
   },
 };
 
+async function getPaper(id: string) {
+  if (PAPERS[id]) return PAPERS[id];
+
+  try {
+    const db = await prisma.paper.findUnique({
+      where: { id },
+      include: {
+        author: { select: { name: true, affiliation: true, email: true } },
+        category: { select: { name: true } },
+        figures: { orderBy: { figureNumber: "asc" } },
+      },
+    });
+
+    if (!db) return null;
+
+    return {
+      id: db.id,
+      title: db.title,
+      abstract: db.abstract,
+      body: db.abstract,
+      authors: [
+        {
+          name: db.author.name || "Anonymous Author",
+          institution: db.author.affiliation || "Independent Scholar",
+          email: db.author.email || undefined,
+        },
+      ],
+      category: db.category?.name || "General Science",
+      keywords: db.keywords || [],
+      publishedAt: (db.publishedAt || db.createdAt).toISOString().split("T")[0],
+      views: db.viewCount || 0,
+      downloads: db.downloadCount || 0,
+      doi: `10.xxxx/shaoor.2026.${db.id.slice(-4)}`,
+      version: db.version,
+      fileUrl: db.fileUrl,
+      fileName: db.fileName,
+      figures: db.figures.map((f) => ({
+        id: f.id,
+        figureNumber: f.figureNumber,
+        title: f.title,
+        caption: f.caption,
+        fileUrl: f.fileUrl,
+        fileName: f.fileName,
+      })),
+    };
+  } catch {
+    return null;
+  }
+}
+
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }> | { id: string };
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const paper = PAPERS[params.id];
+  const resolved = await Promise.resolve(params);
+  const paper = await getPaper(resolved.id);
   if (!paper) return { title: "Paper Not Found — Shaoor" };
   return {
     title: `${paper.title} — Shaoor`,
@@ -103,8 +168,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function PaperDetailPage({ params }: Props) {
-  const paper = PAPERS[params.id];
+export default async function PaperDetailPage({ params }: Props) {
+  const resolved = await Promise.resolve(params);
+  const paper = await getPaper(resolved.id);
   if (!paper) notFound();
 
   const citation = `${paper.authors.map((a) => a.name).join(", ")}. (${paper.publishedAt.slice(0, 4)}). ${paper.title}. Shaoor Journal of Academic Research. https://shaoor.org/papers/${paper.id}${paper.doi ? ` DOI: ${paper.doi}` : ""}`;
@@ -165,33 +231,21 @@ export default function PaperDetailPage({ params }: Props) {
           ))}
         </div>
 
-        {/* Metrics */}
-        <div className={styles.metrics}>
-          <span className={styles.metric}>
-            <Calendar size={14} />
-            Published <strong className={styles.metricValue}>{paper.publishedAt}</strong>
-          </span>
-          <span className={styles.metric}>
-            <Eye size={14} />
-            <strong className={styles.metricValue}>{paper.views.toLocaleString()}</strong> views
-          </span>
-          <span className={styles.metric}>
-            <Download size={14} />
-            <strong className={styles.metricValue}>{paper.downloads.toLocaleString()}</strong> downloads
-          </span>
-        </div>
-
-        {/* Actions */}
-        <div className={styles.actionRow}>
-          <Button variant="primary" size="md" id={`download-paper-${paper.id}`}>
-            <Download size={16} />
-            Download PDF
-          </Button>
-          <Button variant="secondary" size="md" id={`share-paper-${paper.id}`}>
-            <Share2 size={16} />
-            Share
-          </Button>
-        </div>
+        {/* Metrics & Actions with Live View & Download Counter */}
+        <PaperActions
+          paperId={paper.id}
+          title={paper.title}
+          initialViews={paper.views}
+          initialDownloads={paper.downloads}
+          fileUrl={paper.fileUrl}
+          fileName={paper.fileName}
+          citation={citation}
+          doi={paper.doi}
+          authors={paper.authors}
+          publishedAt={paper.publishedAt}
+          abstract={paper.abstract}
+          category={paper.category}
+        />
       </header>
 
       {/* ── Paper Body + Sidebar ────────────────────────────── */}
@@ -240,6 +294,36 @@ export default function PaperDetailPage({ params }: Props) {
               ))}
             </div>
           </section>
+
+          {/* Scientific Figures & Supplementary Materials */}
+          {paper.figures && paper.figures.length > 0 && (
+            <section className={styles.section} aria-labelledby="figures-heading">
+              <h2 className={styles.sectionTitle} id="figures-heading">
+                <ImageIcon size={16} />
+                Scientific Figures & Illustrations ({paper.figures.length})
+              </h2>
+              <div className={styles.figuresGrid}>
+                {paper.figures.map((fig) => (
+                  <div key={fig.id} className={styles.figureCard}>
+                    <div className={styles.figureImgWrap}>
+                      <img
+                        src={fig.fileUrl}
+                        alt={fig.title}
+                        className={styles.figureImg}
+                      />
+                    </div>
+                    <div className={styles.figureInfo}>
+                      <span className={styles.figureNumBadge}>Figure {fig.figureNumber}</span>
+                      <div className={styles.figureTitle}>{fig.title}</div>
+                      {fig.caption && (
+                        <p className={styles.figureCaption}>{fig.caption}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
 
         {/* Sidebar */}
@@ -248,15 +332,7 @@ export default function PaperDetailPage({ params }: Props) {
           <div className={styles.sideCard}>
             <div className={styles.sideCardTitle}>Cite this paper</div>
             <div className={styles.citationBox}>{citation}</div>
-            <Button
-              variant="ghost"
-              size="sm"
-              id={`copy-citation-${paper.id}`}
-              style={{ marginTop: "var(--space-3)", width: "100%" }}
-            >
-              <Copy size={14} />
-              Copy Citation
-            </Button>
+            <CopyCitationButton citation={citation} />
           </div>
 
           {/* Authors */}

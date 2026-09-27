@@ -92,11 +92,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     // Build the JWT token — inject user role from DB
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
         token.isActive = true;
+        if (user.image) token.picture = user.image;
+        if (user.name) token.name = user.name;
+      }
+      if (trigger === "update" && session) {
+        if (session.name !== undefined) token.name = session.name;
+        if (session.image !== undefined) token.picture = session.image;
+        if (session.user) {
+          if (session.user.name !== undefined) token.name = session.user.name;
+          if (session.user.image !== undefined) token.picture = session.user.image;
+        }
       }
       return token;
     },
@@ -111,6 +121,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user && token) {
         session.user.id = token.id as string;
         (session.user as any).role = token.role ?? "CUSTOMER";
+        if (token.name) session.user.name = token.name;
+        if (token.picture) session.user.image = token.picture as string;
       }
       return session;
     },
