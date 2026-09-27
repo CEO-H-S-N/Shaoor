@@ -771,6 +771,6 @@
   color: #1e40af;
   line-height: 1.4;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
 }

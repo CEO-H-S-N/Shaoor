@@ -792,12 +792,9 @@ export function SettingsForm({ initialUser }: Props) {
             </div>
 
             <div className={styles.infoTip}>
-              <Info size={14} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <Info size={14} style={{ flexShrink: 0 }} />
               <div>
                 <strong>Member Since:</strong> {memberSince}
-                <div style={{ marginTop: "2px", color: "#1e3a8a" }}>
-                  Verified on AWS RDS PostgreSQL.
-                </div>
               </div>
             </div>
           </div>
