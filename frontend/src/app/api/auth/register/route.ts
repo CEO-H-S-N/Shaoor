@@ -99,9 +99,9 @@ export async function POST(req: NextRequest) {
     await prisma.$disconnect();
 
     // Send OTP email
-    const { previewUrl } = await sendOtpEmail({ to: email, name, otp, purpose: "signup" });
+    await sendOtpEmail({ to: email, name, otp, purpose: "signup" });
 
-    return NextResponse.json({ success: true, email, previewUrl });
+    return NextResponse.json({ success: true, email });
   } catch (err) {
     console.error("[/api/auth/register]", err);
     return NextResponse.json(

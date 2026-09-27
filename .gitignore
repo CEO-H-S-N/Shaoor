@@ -31,6 +31,8 @@ secrets/
 *.pfx
 *.cert
 *.crt
+*CONFIDENTIAL*
+scripts/
 
 # ─── Vercel ───────────────────────────────────────────────────
 .vercel/

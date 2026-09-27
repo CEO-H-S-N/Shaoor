@@ -11,7 +11,6 @@ function VerifyForm() {
   const router = useRouter();
   const params = useSearchParams();
   const email = params.get("email") || "";
-  const initialPreview = params.get("preview") || null;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +18,6 @@ function VerifyForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [cooldown, setCooldown] = useState(0);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(initialPreview);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -113,7 +111,6 @@ function VerifyForm() {
       if (!res.ok) {
         setError(data.error || "Failed to resend code.");
       } else {
-        if (data.previewUrl) setPreviewUrl(data.previewUrl);
         setCooldown(60);
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
@@ -159,19 +156,6 @@ function VerifyForm() {
           We sent a 6-digit verification code to
         </p>
         <p className={styles.email}>{email}</p>
-
-        {previewUrl && (
-          <div style={{ width: "100%", background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 10, padding: "12px 14px", textAlign: "left" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: "#92400e", marginBottom: 4 }}>🧪 Test Mode — Ethereal Email</div>
-            <p style={{ fontSize: 13, color: "#78350f", margin: "0 0 8px" }}>Click below to open the email and get your OTP code.</p>
-            <a href={previewUrl} target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-flex", alignItems: "center", padding: "6px 14px", background: "#d97706", color: "#fff", borderRadius: 7, fontSize: 13, fontWeight: 700, textDecoration: "none" }}
-              id="btn-preview-signup-email"
-            >
-              Open Email Preview →
-            </a>
-          </div>
-        )}
 
         <form onSubmit={handleVerify} className={styles.form} noValidate>
           <div className={styles.otpRow} onPaste={handlePaste} aria-label="OTP input">

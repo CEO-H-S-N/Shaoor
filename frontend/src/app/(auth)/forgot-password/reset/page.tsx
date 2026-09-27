@@ -22,7 +22,6 @@ function ResetForm() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [cooldown, setCooldown] = useState(60);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -72,7 +71,6 @@ function ResetForm() {
       if (!res.ok) {
         setError(data.error || "Failed to resend code.");
       } else {
-        if (data.previewUrl) setPreviewUrl(data.previewUrl);
         setCooldown(60);
         setOtp(["", "", "", "", "", ""]);
         inputRefs.current[0]?.focus();
@@ -141,16 +139,6 @@ function ResetForm() {
           Enter the 6-digit code sent to
         </p>
         <p className={styles.emailBadge}>{email}</p>
-
-        {previewUrl && (
-          <div className={styles.devBanner}>
-            <span className={styles.devBannerLabel}>🧪 New Code Sent</span>
-            <p className={styles.devBannerText}>View the new OTP email in the Ethereal test inbox.</p>
-            <a href={previewUrl} target="_blank" rel="noopener noreferrer" className={styles.previewBtn}>
-              Open Email Preview →
-            </a>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} style={{ width: "100%", display: "flex", flexDirection: "column", gap: 16 }} noValidate>
           {/* OTP */}

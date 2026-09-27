@@ -63,10 +63,7 @@ export default function SignUpPage() {
         return;
       }
 
-      // Pass Ethereal preview URL to verify page if in test mode
-      const qs = new URLSearchParams({ email: form.email });
-      if (data.previewUrl) qs.set("preview", data.previewUrl);
-      router.push(`/signup/verify?${qs.toString()}`);
+      router.push(`/signup/verify?email=${encodeURIComponent(form.email)}`);
     } catch {
       setError("Network error. Please check your connection.");
       setLoading(false);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Mail, ArrowLeft, Send, CheckCircle2 } from "lucide-react";
+import { Mail, ArrowLeft, Send } from "lucide-react";
 import styles from "./page.module.css";
 
 export default function ForgotPasswordPage() {
@@ -12,8 +12,6 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,10 +23,11 @@ export default function ForgotPasswordPage() {
     setError("");
 
     try {
+      const cleanEmail = email.trim().toLowerCase();
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        body: JSON.stringify({ email: cleanEmail }),
       });
 
       const data = await res.json();
@@ -38,67 +37,12 @@ export default function ForgotPasswordPage() {
         return;
       }
 
-      if (data.previewUrl) setPreviewUrl(data.previewUrl);
-      setSubmitted(true);
+      router.push(`/forgot-password/reset?email=${encodeURIComponent(cleanEmail)}`);
     } catch {
       setError("Network error. Please check your connection.");
     } finally {
       setLoading(false);
     }
-  }
-
-  if (submitted) {
-    return (
-      <div className={styles.page}>
-        <div className={styles.card}>
-          <Link href="/" className={styles.logoLink} aria-label="Shaoor Home">
-            <Image src="/shaoor-logo.png" alt="Shaoor" width={120} height={92} className={styles.logoImage} priority />
-          </Link>
-
-          <div className={styles.successIcon}>
-            <CheckCircle2 size={48} />
-          </div>
-          <h1 className={styles.title}>Check your inbox</h1>
-          <p className={styles.subtitle}>
-            We sent a 6-digit reset code to
-          </p>
-          <p className={styles.emailBadge}>{email}</p>
-
-          {previewUrl && (
-            <div className={styles.devBanner}>
-              <span className={styles.devBannerLabel}>🧪 Test Mode</span>
-              <p className={styles.devBannerText}>
-                Email is running via Ethereal (test inbox). Click the button below to view the OTP email in your browser.
-              </p>
-              <a
-                href={previewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.previewBtn}
-                id="btn-preview-email"
-              >
-                Open Email Preview →
-              </a>
-            </div>
-          )}
-
-          <button
-            className={styles.continueBtn}
-            onClick={() =>
-              router.push(`/forgot-password/reset?email=${encodeURIComponent(email)}`)
-            }
-            id="btn-continue-to-reset"
-          >
-            Continue to Reset Password
-          </button>
-
-          <Link href="/login" className={styles.backLink}>
-            <ArrowLeft size={14} />
-            Back to Sign In
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (

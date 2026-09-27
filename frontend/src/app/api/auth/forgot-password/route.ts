@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     await prisma.emailOtp.create({ data: { email, otp, expiresAt } });
     await prisma.$disconnect();
 
-    const { previewUrl } = await sendOtpEmail({
+    await sendOtpEmail({
       to: email,
       name: user.name || "User",
       otp,
@@ -72,7 +72,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "Password reset code sent to your email.",
-      previewUrl, // Only populated in test/dev mode (Ethereal)
     });
   } catch (err) {
     console.error("[POST /api/auth/forgot-password]", err);

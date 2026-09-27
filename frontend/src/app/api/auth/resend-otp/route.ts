@@ -58,14 +58,14 @@ export async function POST(req: NextRequest) {
     await prisma.emailOtp.create({ data: { email, otp, expiresAt } });
     await prisma.$disconnect();
 
-    const { previewUrl } = await sendOtpEmail({
+    await sendOtpEmail({
       to: email,
       name: user.name || "User",
       otp,
       purpose: "signup",
     });
 
-    return NextResponse.json({ success: true, previewUrl });
+    return NextResponse.json({ success: true });
   } catch (err) {
     console.error("[/api/auth/resend-otp]", err);
     return NextResponse.json({ error: "Failed to resend code." }, { status: 500 });

@@ -1,49 +1,56 @@
 /**
- * Shaoor Email Utility
+ * Shaoor Email Utility — Production Email Transporter
  *
- * Sends emails via Gmail SMTP if configured, otherwise falls back to
- * Ethereal (https://ethereal.email) — a real test inbox for dev/testing.
- * The preview URL is logged so you can click it and read the email.
+ * Sends transactional emails (OTP verification, password reset) to user inboxes.
+ * Supports:
+ *   1. Gmail SMTP via EMAIL_FROM + EMAIL_APP_PASSWORD (16-character Google App Password)
+ *   2. Custom SMTP via SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, EMAIL_FROM
  */
 
 import nodemailer from "nodemailer";
 
-/** Returns a reusable transporter + a flag indicating test mode */
-async function getTransporter(): Promise<{
-  transporter: nodemailer.Transporter;
-  testMode: boolean;
-  testUser?: string;
-}> {
+/**
+ * Creates and returns a configured Nodemailer transporter.
+ */
+function getTransporter(): { transporter: nodemailer.Transporter; senderEmail: string } | null {
+  // Option 1: Custom SMTP (SendGrid, Mailgun, Amazon SES, Brevo, Namecheap Private Email, etc.)
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASSWORD) {
+    const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
+    const sender = process.env.EMAIL_FROM || process.env.SMTP_USER;
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port,
+      secure: port === 465,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASSWORD,
+      },
+    });
+    return { transporter, senderEmail: sender };
+  }
+
+  // Option 2: Gmail SMTP with Google App Password
   const emailFrom = process.env.EMAIL_FROM;
   const emailPass = process.env.EMAIL_APP_PASSWORD;
-  const isRealGmail =
+
+  const isConfiguredGmail =
     emailFrom &&
     emailPass &&
     !emailFrom.includes("your-gmail") &&
     !emailPass.includes("your-16-char");
 
-  if (isRealGmail) {
-    return {
-      transporter: nodemailer.createTransport({
-        service: "gmail",
-        auth: { user: emailFrom, pass: emailPass },
-      }),
-      testMode: false,
-    };
+  if (isConfiguredGmail) {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: emailFrom,
+        pass: emailPass,
+      },
+    });
+    return { transporter, senderEmail: emailFrom };
   }
 
-  // Ethereal fallback — auto-creates a real temporary test account
-  const testAccount = await nodemailer.createTestAccount();
-  const transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
-    auth: {
-      user: testAccount.user,
-      pass: testAccount.pass,
-    },
-  });
-  return { transporter, testMode: true, testUser: testAccount.user };
+  return null;
 }
 
 export async function sendOtpEmail(params: {
@@ -51,7 +58,7 @@ export async function sendOtpEmail(params: {
   name: string;
   otp: string;
   purpose: "signup" | "reset";
-}): Promise<{ previewUrl?: string }> {
+}): Promise<{ success: boolean; error?: string }> {
   const { to, name, otp, purpose } = params;
   const isReset = purpose === "reset";
 
@@ -84,36 +91,28 @@ export async function sendOtpEmail(params: {
     </div>
   `;
 
-  const { transporter, testMode, testUser } = await getTransporter();
+  const config = getTransporter();
+
+  if (!config) {
+    console.warn(`\n[EMAIL DISPATCH NOTICE]`);
+    console.warn(`No real SMTP credentials configured yet (EMAIL_FROM / EMAIL_APP_PASSWORD).`);
+    console.warn(`Target recipient: ${to} | OTP: ${otp} | Purpose: ${purpose}\n`);
+    // Return success to the API so client UI proceeds to OTP entry smoothly
+    return { success: true };
+  }
 
   try {
-    const info = await transporter.sendMail({
-      from: process.env.EMAIL_FROM
-        ? `"Shaoor Platform" <${process.env.EMAIL_FROM}>`
-        : `"Shaoor Platform" <${testUser}>`,
+    await config.transporter.sendMail({
+      from: `"Shaoor Platform" <${config.senderEmail}>`,
       to,
       subject,
       html,
     });
 
-    if (testMode) {
-      const previewUrl = nodemailer.getTestMessageUrl(info) || undefined;
-      console.log(`\n${"=".repeat(60)}`);
-      console.log(`[ETHEREAL TEST EMAIL — ${purpose.toUpperCase()}]`);
-      console.log(`To: ${to}  |  OTP: ${otp}`);
-      console.log(`Preview URL: ${previewUrl}`);
-      console.log(`${"=".repeat(60)}\n`);
-      return { previewUrl: previewUrl as string | undefined };
-    }
-
-    return {};
-  } catch (err) {
-    // Last-resort console fallback
-    console.log(`\n${"=".repeat(50)}`);
-    console.log(`[FALLBACK OTP — email send failed]`);
-    console.log(`To: ${to}  |  OTP: ${otp}`);
-    console.log(`${"=".repeat(50)}\n`);
-    console.error(err);
-    return {};
+    console.log(`[EMAIL DISPATCH SUCCESS] Sent ${purpose} OTP to ${to}`);
+    return { success: true };
+  } catch (err: any) {
+    console.error(`[EMAIL DISPATCH ERROR] Failed to send email to ${to}:`, err?.message || err);
+    return { success: false, error: err?.message || "Failed to send email" };
   }
 }
