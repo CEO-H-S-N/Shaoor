@@ -41,7 +41,7 @@ const getCachedCategories = unstable_cache(
 const getCachedMostViewed = unstable_cache(
   async () => {
     return prisma.paper.findMany({
-      where: { status: "PUBLISHED" },
+      where: { status: "ACCEPTED" },
       orderBy: { viewCount: "desc" },
       take: 4,
       include: {
@@ -118,7 +118,7 @@ export default async function PapersPage({ searchParams }: PageProps) {
   const skip = (page - 1) * PAPERS_PER_PAGE;
 
   // Build query where filter for PostgreSQL
-  const where: any = { status: "PUBLISHED" };
+  const where: any = { status: "ACCEPTED" };
 
   if (query) {
     where.OR = [

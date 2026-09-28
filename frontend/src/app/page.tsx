@@ -45,8 +45,8 @@ export default async function HomePage() {
   try {
     const [published, popular] = await Promise.all([
       prisma.paper.findMany({
-        where: { status: "PUBLISHED" },
-        orderBy: { publishedAt: "desc" },
+        where: { status: "ACCEPTED" },
+        orderBy: { decisionAt: "desc" },
         take: 8,
         include: {
           category: { select: { name: true, color: true } },
@@ -54,7 +54,7 @@ export default async function HomePage() {
         },
       }),
       prisma.paper.findMany({
-        where: { status: "PUBLISHED" },
+        where: { status: "ACCEPTED" },
         orderBy: { viewCount: "desc" },
         take: 8,
         include: {
@@ -163,7 +163,7 @@ export default async function HomePage() {
                       <span className={styles.cardAuthor}>
                         {paper.author?.name || "Anonymous Author"}
                       </span>
-                      <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                      <span>{formatDate(paper.decisionAt || paper.publishedAt || paper.createdAt)}</span>
                     </div>
                   </Link>
                 ))
@@ -249,7 +249,7 @@ export default async function HomePage() {
                       <span className={styles.cardAuthor}>
                         {paper.author?.name || "Anonymous Author"}
                       </span>
-                      <span>{formatDate(paper.publishedAt || paper.createdAt)}</span>
+                      <span>{formatDate(paper.decisionAt || paper.publishedAt || paper.createdAt)}</span>
                     </div>
                   </Link>
                 ))

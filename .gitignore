@@ -80,3 +80,19 @@ next-env.d.ts
 # ─── Misc ─────────────────────────────────────────────────────
 .cache/
 *.local
+
+# ─── Documentation & Tracker Files (Internal Only) ────────────
+docs/
+*.md
+!LICENSE
+*.pdf
+
+# ─── AI Agent Instruction Files ───────────────────────────────
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+README.md
+
+# ─── Seed / Admin Scripts (Hardcoded Data) ────────────────────
+**/reseed_admin*
+**/reseed*
