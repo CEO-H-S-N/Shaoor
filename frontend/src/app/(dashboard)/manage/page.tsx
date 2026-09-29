@@ -63,8 +63,8 @@ export default async function ManagePage() {
   const session = await auth();
   const role = (session?.user as any)?.role;
 
-  // Only Designers can access this portal
-  if (role !== "DESIGNER") {
+  // Only ADMIN and DESIGNER roles can access this portal
+  if (role !== "ADMIN" && role !== "DESIGNER") {
     redirect("/my-papers");
   }
 

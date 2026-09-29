@@ -15,6 +15,7 @@ import {
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { RevolvingCarouselTrack } from "@/components/home/RevolvingCarouselTrack";
+import { AnnouncementPopup } from "@/components/home/AnnouncementPopup";
 import { prisma } from "@/lib/prisma";
 import styles from "./page.module.css";
 
@@ -70,6 +71,27 @@ export default async function HomePage() {
     console.error("Database query fallback on homepage:", error);
   }
 
+  // Fetch active announcement for popup
+  let announcement: { title: string; message: string; imageUrl: string | null; linkUrl: string | null; linkLabel: string | null; showPopup: boolean } | null = null;
+  try {
+    const ann = await prisma.announcement.findFirst({
+      where: { isActive: true },
+      orderBy: { updatedAt: "desc" },
+    });
+    if (ann) {
+      announcement = {
+        title: ann.title,
+        message: ann.message,
+        imageUrl: ann.imageUrl,
+        linkUrl: ann.linkUrl,
+        linkLabel: ann.linkLabel,
+        showPopup: ann.showPopup,
+      };
+    }
+  } catch {
+    // Silent fallback — no announcement
+  }
+
   // Ensure plenty of cards so the track is always completely populated across all screen sizes
   function makeLoopList<T>(items: T[], minLength = 12): T[] {
     if (items.length === 0) return [];
@@ -89,6 +111,9 @@ export default async function HomePage() {
     <div className={styles.pageWrapper}>
       {/* Top Bar — untouched as requested */}
       <Header />
+
+      {/* Announcement Popup (toggleable by admin) */}
+      <AnnouncementPopup announcement={announcement} />
 
       <main id="main-content">
         {/* ─── Hero Section with Nature Background at Top (No Card, No Overlay) ─── */}

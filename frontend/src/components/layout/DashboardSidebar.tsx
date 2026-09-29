@@ -29,11 +29,12 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/my-papers", label: "My Papers", icon: FileText, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
   { href: "/submit", label: "Submit Paper", icon: Send, roles: ["CUSTOMER", "ADMIN", "DESIGNER"] },
   { href: "/review", label: "Review Queue", icon: ClipboardList, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
-  { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
-  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
-  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
-  { href: "/admin/edit-team", label: "Edit Our Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-team", label: "Edit Our Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/edit-announcement", label: "Edit Announcement", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
 ];
 
 interface Props {

@@ -16,6 +16,7 @@ import {
   MessageSquare,
   FileText,
   FileCheck,
+  Trash2,
 } from "lucide-react";
 import styles from "./page.module.css";
 
@@ -138,6 +139,33 @@ export function ReviewQueueView({ initialPapers }: Props) {
       alert(`Paper has been denied. An official notification with your feedback has been sent to the author.`);
     } catch (err: any) {
       alert(err.message || "Failed to process denial");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Delete paper permanently
+  async function handleDelete(paperId: string, paperTitle: string) {
+    if (!confirm(`Are you sure you want to PERMANENTLY DELETE "${paperTitle}"?\n\nThis action cannot be undone. The paper, all its reviews, versions, and figures will be removed.`)) {
+      return;
+    }
+    if (!confirm(`Final confirmation: This will irreversibly delete the paper and all associated data. Proceed?`)) {
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/papers/${paperId}/delete`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to delete paper");
+
+      setPapers((prev) => prev.filter((p) => p.id !== paperId));
+      alert(`Paper has been permanently deleted.`);
+    } catch (err: any) {
+      alert(err.message || "Deletion failed");
     } finally {
       setSubmitting(false);
     }
@@ -393,6 +421,18 @@ export function ReviewQueueView({ initialPapers }: Props) {
                       Deny
                     </button>
                   </div>
+
+                  <button
+                    type="button"
+                    disabled={submitting}
+                    onClick={() => handleDelete(paper.id, paper.title)}
+                    className={styles.btnDelete}
+                    id={`delete-btn-${paper.id}`}
+                    title="Permanently delete this paper from the system"
+                  >
+                    <Trash2 size={12} />
+                    Delete
+                  </button>
                 </div>
               </div>
             );

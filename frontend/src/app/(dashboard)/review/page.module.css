@@ -306,6 +306,33 @@
   background: #f1f5f9;
 }
 
+.btnDelete {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #334155;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 150ms ease;
+  margin-top: 4px;
+  width: 100%;
+  justify-content: center;
+}
+
+.btnDelete:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.btnDelete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .reasonModal {
   margin-top: 14px;
   padding: 16px;

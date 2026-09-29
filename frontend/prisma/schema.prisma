@@ -312,3 +312,21 @@ model TeamMember {
 
   @@map("team_members")
 }
+
+// ─── Site Announcement ────────────────────────────────────────
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  message     String   @db.Text
+  imageUrl    String?  @map("image_url")
+  linkUrl     String?  @map("link_url")
+  linkLabel   String?  @map("link_label")
+  isActive    Boolean  @default(false) @map("is_active")
+  showPopup   Boolean  @default(false) @map("show_popup")
+  updatedBy   String?  @map("updated_by")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("announcements")
+}

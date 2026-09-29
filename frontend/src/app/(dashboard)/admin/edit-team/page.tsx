@@ -16,9 +16,9 @@ export default async function EditTeamPage() {
     redirect("/login");
   }
 
-  const isMaster = !!(session.user as any)?.isMaster || session.user.email === "shouket.tilwani@gmail.com";
-  if (!isMaster) {
-    redirect("/review");
+  const role = (session.user as any)?.role;
+  if (role !== "ADMIN" && role !== "DESIGNER") {
+    redirect("/my-papers");
   }
 
   const rawMembers = await prisma.teamMember.findMany({
