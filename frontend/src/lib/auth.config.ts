@@ -6,6 +6,16 @@
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
 
+function sanitizeImageUrl(url: unknown): string | null {
+  if (typeof url !== "string") return null;
+  const trimmed = url.trim();
+  // Reject base64 data URIs or any URL > 500 chars to prevent Cookie bloat / HTTP 494 on iOS / mobile
+  if (!trimmed || trimmed.startsWith("data:") || trimmed.length > 500) {
+    return null;
+  }
+  return trimmed;
+}
+
 export const authConfig: NextAuthConfig = {
   providers: [
     Google({
@@ -29,16 +39,26 @@ export const authConfig: NextAuthConfig = {
         token.id = user.id;
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
         token.isMaster = (user as any).isMaster ?? (user.email === "shouket.tilwani@gmail.com");
-        if ((user as any).image) token.picture = (user as any).image;
+        const cleanImg = sanitizeImageUrl((user as any).image);
+        if (cleanImg) {
+          token.picture = cleanImg;
+        } else {
+          delete token.picture;
+        }
         if (user.name) token.name = user.name;
       }
       if (trigger === "update" && session) {
         if (session.name !== undefined) token.name = session.name;
-        if (session.image !== undefined) token.picture = session.image;
-        if (session.user) {
-          if (session.user.name !== undefined) token.name = session.user.name;
-          if (session.user.image !== undefined) token.picture = session.user.image;
+        const newImg = session.image !== undefined ? session.image : session.user?.image;
+        if (newImg !== undefined) {
+          const cleanImg = sanitizeImageUrl(newImg);
+          if (cleanImg) {
+            token.picture = cleanImg;
+          } else {
+            delete token.picture;
+          }
         }
+        if (session.user?.name !== undefined) token.name = session.user.name;
       }
       return token;
     },

@@ -93,6 +93,16 @@ export async function PATCH(req: NextRequest) {
     const cleanBio = bio ? bio.trim() : null;
     const cleanImage = image ? image.trim() : null;
 
+    // Security & Header size guard: reject data URIs or oversized images to prevent HTTP 494
+    if (cleanImage) {
+      if (cleanImage.startsWith("data:") || cleanImage.length > 500) {
+        return NextResponse.json(
+          { error: "Direct image data embeds are not supported. Please upload an image file or choose an avatar preset." },
+          { status: 400 }
+        );
+      }
+    }
+
     // Check if username is taken by another user
     if (cleanUsername) {
       const existingUser = await prisma.user.findFirst({

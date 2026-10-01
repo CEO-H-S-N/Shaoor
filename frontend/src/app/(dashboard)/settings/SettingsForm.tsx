@@ -27,49 +27,43 @@ import {
 } from "lucide-react";
 import styles from "./settings.module.css";
 
-// ─── Academic Vector Avatar Presets ──────────────────────────
+// ─── Academic Vector Avatar Presets (Static SVGs to prevent cookie bloat) ───
 export const ACADEMIC_AVATARS = [
   {
     id: "scholar-indigo",
     label: "Indigo Scholar",
     bg: "#1e3a8a",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%231e3a8a'/><path d='M50 24L18 39L50 54L82 39L50 24Z' fill='%23ffffff'/><path d='M30 45V64C30 73 40 78 50 78C60 78 70 73 70 64V45L50 55L30 45Z' fill='%2393c5fd'/><path d='M82 39V65' stroke='%23fbbf24' stroke-width='3' stroke-linecap='round'/><circle cx='82' cy='67' r='3' fill='%23fbbf24'/></svg>",
+    url: "/avatars/scholar-indigo.svg",
   },
   {
     id: "scientist-emerald",
     label: "Emerald Bio",
     bg: "#065f46",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23065f46'/><circle cx='50' cy='50' r='24' fill='none' stroke='%23a7f3d0' stroke-width='4'/><circle cx='50' cy='32' r='7' fill='%23ffffff'/><circle cx='65' cy='59' r='7' fill='%23ffffff'/><circle cx='35' cy='59' r='7' fill='%23ffffff'/><path d='M50 32L65 59M50 32L35 59M35 59H65' stroke='%236ee7b7' stroke-width='3'/></svg>",
+    url: "/avatars/scientist-emerald.svg",
   },
   {
     id: "theorist-violet",
     label: "Violet Physics",
     bg: "#581c87",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%23581c87'/><ellipse cx='50' cy='50' rx='34' ry='14' fill='none' stroke='%23d8b4fe' stroke-width='3' transform='rotate(30 50 50)'/><ellipse cx='50' cy='50' rx='34' ry='14' fill='none' stroke='%23d8b4fe' stroke-width='3' transform='rotate(-30 50 50)'/><ellipse cx='50' cy='50' rx='34' ry='14' fill='none' stroke='%23d8b4fe' stroke-width='3' transform='rotate(90 50 50)'/><circle cx='50' cy='50' r='7' fill='%23ffffff'/></svg>",
+    url: "/avatars/theorist-violet.svg",
   },
   {
     id: "astronomer-amber",
     label: "Amber Cosmos",
     bg: "#78350f",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%2378350f'/><circle cx='50' cy='50' r='18' fill='%23fef3c7'/><ellipse cx='50' cy='50' rx='36' ry='11' fill='none' stroke='%23fcd34d' stroke-width='4' transform='rotate(-20 50 50)'/><circle cx='70' cy='28' r='3' fill='%23ffffff'/><circle cx='28' cy='72' r='2' fill='%23ffffff'/></svg>",
+    url: "/avatars/astronomer-amber.svg",
   },
   {
     id: "mathematician-slate",
     label: "Slate Math",
     bg: "#0f172a",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%230f172a'/><text x='50' y='64' font-family='serif' font-size='42' font-weight='bold' fill='%23ffffff' text-anchor='middle'>%CE%A3</text><circle cx='50' cy='50' r='36' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-dasharray='4 3'/></svg>",
+    url: "/avatars/mathematician-slate.svg",
   },
   {
     id: "cyan-engineer",
     label: "Cyan Systems",
     bg: "#0e7490",
-    dataUri:
-      "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='50' fill='%230e7490'/><circle cx='50' cy='50' r='12' fill='%23ffffff'/><path d='M50 20V32M50 68V80M20 50H32M68 50H80M29 29L38 38M62 62L71 71M71 29L62 38M38 62L29 71' stroke='%23a5f3fc' stroke-width='4' stroke-linecap='round'/></svg>",
+    url: "/avatars/cyan-engineer.svg",
   },
 ];
 
@@ -110,6 +104,7 @@ export function SettingsForm({ initialUser }: Props) {
 
   // UI state
   const [showPresets, setShowPresets] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [statusMessage, setStatusMessage] = useState<{
     type: "success" | "error";
@@ -141,8 +136,8 @@ export function SettingsForm({ initialUser }: Props) {
     setStatusMessage(null);
   }
 
-  // Handle client-side square crop and compression
-  function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  // Handle client-side square crop and direct S3 upload (avoids base64 cookie bloat)
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -156,40 +151,85 @@ export function SettingsForm({ initialUser }: Props) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const img = document.createElement("img");
-      img.onload = () => {
-        // Create canvas for 256x256 square crop
-        const canvas = document.createElement("canvas");
-        const size = 256;
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
+    setUploadingImage(true);
+    setStatusMessage(null);
 
-        if (!ctx) {
-          setImage(event.target?.result as string);
-          return;
-        }
+    try {
+      const reader = new FileReader();
+      const fileDataUrl = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-        // Center square crop calculations
-        const minDim = Math.min(img.width, img.height);
-        const startX = (img.width - minDim) / 2;
-        const startY = (img.height - minDim) / 2;
+      const img = new window.Image();
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = reject;
+        img.src = fileDataUrl;
+      });
 
-        ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size);
+      // Canvas square crop to 256x256
+      const canvas = document.createElement("canvas");
+      const size = 256;
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not initialize image processor");
 
-        // Convert to lightweight data URI
-        const compressedDataUrl = canvas.toDataURL("image/jpeg", 0.88);
-        setImage(compressedDataUrl);
-        setStatusMessage(null);
-      };
-      img.src = event.target?.result as string;
-    };
-    reader.readAsDataURL(file);
+      const minDim = Math.min(img.width, img.height);
+      const startX = (img.width - minDim) / 2;
+      const startY = (img.height - minDim) / 2;
+      ctx.drawImage(img, startX, startY, minDim, minDim, 0, 0, size, size);
 
-    // Reset input value so same file can be re-selected if desired
-    e.target.value = "";
+      const blob = await new Promise<Blob | null>((resolve) => {
+        canvas.toBlob((b) => resolve(b), "image/jpeg", 0.85);
+      });
+
+      if (!blob) throw new Error("Could not compress avatar image");
+
+      // Request S3 presigned upload URL via existing /api/upload
+      const presignRes = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fileName: `avatar-${Date.now()}.jpg`,
+          fileType: "image/jpeg",
+          fileSize: blob.size,
+          isFigure: true,
+        }),
+      });
+
+      if (!presignRes.ok) {
+        const errData = await presignRes.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to initialize image upload");
+      }
+
+      const { uploadUrl, fileUrl } = await presignRes.json();
+
+      // Upload directly to S3
+      const s3Res = await fetch(uploadUrl, {
+        method: "PUT",
+        body: blob,
+        headers: { "Content-Type": "image/jpeg" },
+      });
+
+      if (!s3Res.ok) {
+        throw new Error("Failed to save image to cloud storage");
+      }
+
+      setImage(fileUrl);
+      setStatusMessage({ type: "success", text: "Photo uploaded successfully! Click 'Save Changes' to update your profile." });
+    } catch (err: any) {
+      console.error("Avatar upload failed:", err);
+      setStatusMessage({
+        type: "error",
+        text: err.message || "Failed to upload image. Please try again.",
+      });
+    } finally {
+      setUploadingImage(false);
+      e.target.value = "";
+    }
   }
 
   function handleReset() {
@@ -369,16 +409,27 @@ export function SettingsForm({ initialUser }: Props) {
                       type="button"
                       className={styles.uploadBtn}
                       onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingImage}
                       id="upload-pfp-btn"
                     >
-                      <Upload size={14} />
-                      Upload Photo
+                      {uploadingImage ? (
+                        <>
+                          <Loader2 size={14} className={styles.loadingSpinner} />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={14} />
+                          Upload Photo
+                        </>
+                      )}
                     </button>
 
                     <button
                       type="button"
                       className={styles.presetToggleBtn}
                       onClick={() => setShowPresets(!showPresets)}
+                      disabled={uploadingImage}
                       id="toggle-presets-btn"
                     >
                       <Sparkles size={14} />
@@ -390,6 +441,7 @@ export function SettingsForm({ initialUser }: Props) {
                         type="button"
                         className={styles.removeBtn}
                         onClick={() => setImage(null)}
+                        disabled={uploadingImage}
                         title="Remove custom photo"
                         id="remove-pfp-btn"
                       >
@@ -400,7 +452,7 @@ export function SettingsForm({ initialUser }: Props) {
                   </div>
 
                   <p className={styles.avatarHelp}>
-                    Supports JPG, PNG, or WebP. Auto-centered and resized to 256×256 px.
+                    Supports JPG, PNG, or WebP. Auto-centered and uploaded securely to cloud storage.
                   </p>
                 </div>
               </div>
@@ -411,7 +463,7 @@ export function SettingsForm({ initialUser }: Props) {
                   <div className={styles.presetsTitle}>Select an Academic Motif:</div>
                   <div className={styles.presetsGrid}>
                     {ACADEMIC_AVATARS.map((preset) => {
-                      const isSelected = image === preset.dataUri;
+                      const isSelected = image === preset.url;
                       return (
                         <button
                           key={preset.id}
@@ -420,13 +472,13 @@ export function SettingsForm({ initialUser }: Props) {
                             isSelected ? styles.presetOptionActive : ""
                           }`}
                           onClick={() => {
-                            setImage(preset.dataUri);
+                            setImage(preset.url);
                             setStatusMessage(null);
                           }}
                           title={preset.label}
                         >
                           <img
-                            src={preset.dataUri}
+                            src={preset.url}
                             alt={preset.label}
                             className={styles.presetSvg}
                           />

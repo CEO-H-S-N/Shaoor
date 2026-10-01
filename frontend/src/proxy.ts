@@ -106,6 +106,19 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
+function cleanChunkedCookies(res: NextResponse, req: NextRequest): NextResponse {
+  const cookieHeader = req.headers.get("cookie") || "";
+  if (cookieHeader.includes("session-token.")) {
+    for (let i = 0; i <= 15; i++) {
+      res.cookies.delete(`authjs.session-token.${i}`);
+      res.cookies.delete(`__Secure-authjs.session-token.${i}`);
+      res.cookies.delete(`next-auth.session-token.${i}`);
+      res.cookies.delete(`__Secure-next-auth.session-token.${i}`);
+    }
+  }
+  return res;
+}
+
 // ─── Main Middleware ──────────────────────────────────────────
 export default auth(async function middleware(request) {
   const { pathname } = request.nextUrl;
@@ -143,7 +156,7 @@ export default auth(async function middleware(request) {
   // Redirect logged-in users away from auth pages
   if (isLoggedIn && isRouteMatch(pathname, AUTH_ROUTES)) {
     const dest = ["ADMIN", "DESIGNER"].includes(userRole) ? "/review" : "/my-papers";
-    return NextResponse.redirect(new URL(dest, request.url));
+    return cleanChunkedCookies(NextResponse.redirect(new URL(dest, request.url)), request);
   }
 
   // Protect dashboard routes — redirect to login if not authenticated
@@ -153,21 +166,21 @@ export default auth(async function middleware(request) {
   ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
-    return NextResponse.redirect(loginUrl);
+    return cleanChunkedCookies(NextResponse.redirect(loginUrl), request);
   }
 
   // ── 3. Role-Based Access ──────────────────────────────────
   if (isRouteMatch(pathname, ADMIN_ROUTES) && !["ADMIN", "DESIGNER"].includes(userRole)) {
-    return NextResponse.redirect(new URL("/my-papers", request.url));
+    return cleanChunkedCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
   }
 
   if (isRouteMatch(pathname, DESIGNER_ROUTES) && !["ADMIN", "DESIGNER"].includes(userRole)) {
-    return NextResponse.redirect(new URL("/my-papers", request.url));
+    return cleanChunkedCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
   }
 
-  // ── 4. Add Security Headers to all responses ───────────────
+  // ── 4. Add Security Headers and purge bloated legacy chunk cookies ──
   const response = NextResponse.next();
-  return addSecurityHeaders(response);
+  return cleanChunkedCookies(addSecurityHeaders(response), request);
 });
 
 // ─── Middleware Config ────────────────────────────────────────

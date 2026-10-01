@@ -12,6 +12,16 @@ import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 import { prisma } from "./prisma";
 
+function sanitizeImageUrl(url: unknown): string | null {
+  if (typeof url !== "string") return null;
+  const trimmed = url.trim();
+  // Reject base64 data URIs or any URL > 500 chars to prevent Cookie bloat / HTTP 494 on iOS / mobile
+  if (!trimmed || trimmed.startsWith("data:") || trimmed.length > 500) {
+    return null;
+  }
+  return trimmed;
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
 
@@ -67,7 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               id: user.id,
               email: user.email,
               name: user.name ?? "Dr. Shoukat Tilwani",
-              image: user.image,
+              image: sanitizeImageUrl(user.image),
               role: "ADMIN",
               isMaster: true,
             };
@@ -82,7 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }).catch(() => null);
 
           if (user) {
-            return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+            return { id: user.id, email: user.email, name: user.name, image: sanitizeImageUrl(user.image), role: user.role };
           }
         }
 
@@ -93,7 +103,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }).catch(() => null);
 
           if (user) {
-            return { id: user.id, email: user.email, name: user.name, image: user.image, role: user.role };
+            return { id: user.id, email: user.email, name: user.name, image: sanitizeImageUrl(user.image), role: user.role };
           }
         }
 
@@ -123,7 +133,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          image: user.image,
+          image: sanitizeImageUrl(user.image),
           role: user.role,
           isMaster,
         };
@@ -146,16 +156,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
         token.isMaster = !!(user as any).isMaster || token.email === "shouket.tilwani@gmail.com";
         token.isActive = true;
-        if (user.image) token.picture = user.image;
+        const cleanImg = sanitizeImageUrl((user as any).image);
+        if (cleanImg) {
+          token.picture = cleanImg;
+        } else {
+          delete token.picture;
+        }
         if (user.name) token.name = user.name;
       }
       if (trigger === "update" && session) {
         if (session.name !== undefined) token.name = session.name;
-        if (session.image !== undefined) token.picture = session.image;
-        if (session.user) {
-          if (session.user.name !== undefined) token.name = session.user.name;
-          if (session.user.image !== undefined) token.picture = session.user.image;
+        const newImg = session.image !== undefined ? session.image : session.user?.image;
+        if (newImg !== undefined) {
+          const cleanImg = sanitizeImageUrl(newImg);
+          if (cleanImg) {
+            token.picture = cleanImg;
+          } else {
+            delete token.picture;
+          }
         }
+        if (session.user?.name !== undefined) token.name = session.user.name;
       }
       return token;
     },
