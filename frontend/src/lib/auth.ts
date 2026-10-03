@@ -12,16 +12,6 @@ import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 import { prisma } from "./prisma";
 
-function sanitizeImageUrl(url: unknown): string | null {
-  if (typeof url !== "string") return null;
-  const trimmed = url.trim();
-  // Reject base64 data URIs or any URL > 500 chars to prevent Cookie bloat / HTTP 494 on iOS / mobile
-  if (!trimmed || trimmed.startsWith("data:") || trimmed.length > 500) {
-    return null;
-  }
-  return trimmed;
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
 
@@ -77,7 +67,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               id: user.id,
               email: user.email,
               name: user.name ?? "Dr. Shoukat Tilwani",
-              image: sanitizeImageUrl(user.image),
+              // image intentionally omitted — not stored in JWT cookie
               role: "ADMIN",
               isMaster: true,
             };
@@ -92,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }).catch(() => null);
 
           if (user) {
-            return { id: user.id, email: user.email, name: user.name, image: sanitizeImageUrl(user.image), role: user.role };
+            return { id: user.id, email: user.email, name: user.name, role: user.role };
           }
         }
 
@@ -103,7 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }).catch(() => null);
 
           if (user) {
-            return { id: user.id, email: user.email, name: user.name, image: sanitizeImageUrl(user.image), role: user.role };
+            return { id: user.id, email: user.email, name: user.name, role: user.role };
           }
         }
 
@@ -133,7 +123,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          image: sanitizeImageUrl(user.image),
+          // image intentionally omitted — not stored in JWT cookie
           role: user.role,
           isMaster,
         };
@@ -141,41 +131,36 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
 
-  // Override session to database strategy in server contexts
+  // Keep JWT for middleware compatibility — maxAge capped at 7 days
+  // so the token expiry field (exp) stays small and cookie stays compact.
   session: {
-    strategy: "jwt", // Keep JWT for middleware compatibility
-    maxAge: 30 * 24 * 60 * 60,    // 30 days
-    updateAge: 24 * 60 * 60,       // refresh every 24h
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60,      // 7 days (matches auth.config.ts)
+    updateAge: 24 * 60 * 60,
   },
 
   callbacks: {
-    // Build the JWT token — inject user role from DB
+    // Build the JWT token — keep payload minimal to prevent HTTP 494
+    // cookie-too-large errors on Safari / macOS / iOS.
+    // Fields stored: id, name (≤60 chars), role, isMaster, isActive.
+    // Fields NOT stored: picture/image (adds 150-300 bytes per request).
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
+        if (user.name) token.name = user.name.slice(0, 60);
         token.role = (user as any).role ?? token.role ?? "CUSTOMER";
-        token.isMaster = !!(user as any).isMaster || token.email === "shouket.tilwani@gmail.com";
+        token.isMaster =
+          !!(user as any).isMaster ||
+          token.email === "shouket.tilwani@gmail.com";
         token.isActive = true;
-        const cleanImg = sanitizeImageUrl((user as any).image);
-        if (cleanImg) {
-          token.picture = cleanImg;
-        } else {
-          delete token.picture;
-        }
-        if (user.name) token.name = user.name;
+        // Deliberately omit token.picture — see file header for rationale
+        delete token.picture;
       }
       if (trigger === "update" && session) {
-        if (session.name !== undefined) token.name = session.name;
-        const newImg = session.image !== undefined ? session.image : session.user?.image;
-        if (newImg !== undefined) {
-          const cleanImg = sanitizeImageUrl(newImg);
-          if (cleanImg) {
-            token.picture = cleanImg;
-          } else {
-            delete token.picture;
-          }
-        }
-        if (session.user?.name !== undefined) token.name = session.user.name;
+        if (session.name !== undefined) token.name = (session.name as string).slice(0, 60);
+        if (session.role !== undefined) token.role = session.role;
+        // Refuse to store image updates in the JWT
+        delete token.picture;
       }
       return token;
     },
@@ -190,9 +175,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user && token) {
         session.user.id = token.id as string;
         (session.user as any).role = token.role ?? "CUSTOMER";
-        (session.user as any).isMaster = !!(token as any).isMaster || session.user.email === "shouket.tilwani@gmail.com";
+        (session.user as any).isMaster =
+          !!(token as any).isMaster ||
+          session.user.email === "shouket.tilwani@gmail.com";
         if (token.name) session.user.name = token.name;
-        if (token.picture) session.user.image = token.picture as string;
+        // session.user.image intentionally not set from token —
+        // components should load avatar via useSession() or from DB
       }
       return session;
     },

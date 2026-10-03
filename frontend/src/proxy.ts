@@ -106,16 +106,28 @@ function addSecurityHeaders(response: NextResponse): NextResponse {
   return response;
 }
 
-function cleanChunkedCookies(res: NextResponse, req: NextRequest): NextResponse {
+// ─── Cookie Cleanup ─────────────────────────────────────────────────
+// Aggressively deletes all chunked and legacy session cookies.
+// Users who signed in before the 494-fix may have bloated cookie jars;
+// this ensures every response cleans them up without manual browser action.
+function clearStaleCookies(res: NextResponse, req: NextRequest): NextResponse {
   const cookieHeader = req.headers.get("cookie") || "";
-  if (cookieHeader.includes("session-token.")) {
-    for (let i = 0; i <= 15; i++) {
-      res.cookies.delete(`authjs.session-token.${i}`);
-      res.cookies.delete(`__Secure-authjs.session-token.${i}`);
-      res.cookies.delete(`next-auth.session-token.${i}`);
-      res.cookies.delete(`__Secure-next-auth.session-token.${i}`);
-    }
+
+  // Always wipe chunked variants (indices 0-19) regardless of whether we
+  // detect them, so stale cookies from before the fix are cleared immediately.
+  for (let i = 0; i <= 19; i++) {
+    res.cookies.delete(`authjs.session-token.${i}`);
+    res.cookies.delete(`__Secure-authjs.session-token.${i}`);
+    res.cookies.delete(`next-auth.session-token.${i}`);
+    res.cookies.delete(`__Secure-next-auth.session-token.${i}`);
   }
+
+  // Also wipe the old next-auth v4 single-cookie name if present
+  if (cookieHeader.includes("next-auth.session-token")) {
+    res.cookies.delete("next-auth.session-token");
+    res.cookies.delete("__Secure-next-auth.session-token");
+  }
+
   return res;
 }
 
@@ -156,7 +168,7 @@ export default auth(async function middleware(request) {
   // Redirect logged-in users away from auth pages
   if (isLoggedIn && isRouteMatch(pathname, AUTH_ROUTES)) {
     const dest = ["ADMIN", "DESIGNER"].includes(userRole) ? "/review" : "/my-papers";
-    return cleanChunkedCookies(NextResponse.redirect(new URL(dest, request.url)), request);
+    return clearStaleCookies(NextResponse.redirect(new URL(dest, request.url)), request);
   }
 
   // Protect dashboard routes — redirect to login if not authenticated
@@ -166,21 +178,21 @@ export default auth(async function middleware(request) {
   ) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
-    return cleanChunkedCookies(NextResponse.redirect(loginUrl), request);
+    return clearStaleCookies(NextResponse.redirect(loginUrl), request);
   }
 
   // ── 3. Role-Based Access ──────────────────────────────────
   if (isRouteMatch(pathname, ADMIN_ROUTES) && !["ADMIN", "DESIGNER"].includes(userRole)) {
-    return cleanChunkedCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
+    return clearStaleCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
   }
 
   if (isRouteMatch(pathname, DESIGNER_ROUTES) && !["ADMIN", "DESIGNER"].includes(userRole)) {
-    return cleanChunkedCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
+    return clearStaleCookies(NextResponse.redirect(new URL("/my-papers", request.url)), request);
   }
 
-  // ── 4. Add Security Headers and purge bloated legacy chunk cookies ──
+  // ── 4. Add Security Headers and clear all stale/chunked legacy cookies ──
   const response = NextResponse.next();
-  return cleanChunkedCookies(addSecurityHeaders(response), request);
+  return clearStaleCookies(addSecurityHeaders(response), request);
 });
 
 // ─── Middleware Config ────────────────────────────────────────
