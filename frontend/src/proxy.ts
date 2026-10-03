@@ -135,12 +135,10 @@ function clearStaleCookies(res: NextResponse, req: NextRequest): NextResponse {
 export default auth(async function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for static assets, API auth routes, and the emergency
-  // fix-session endpoint (must be reachable even with oversized cookies)
+  // Skip middleware for static assets and API auth routes
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api/auth") ||
-    pathname.startsWith("/api/fix-session") ||
     pathname.includes(".") // static files (favicon, images, etc.)
   ) {
     return NextResponse.next();
@@ -205,9 +203,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization)
      * - favicon.ico
-     * - api/fix-session (emergency cookie-clear endpoint — must work even
-     *   when cookies are too large; the auth() wrapper must NOT run here)
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/fix-session).*)",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };
