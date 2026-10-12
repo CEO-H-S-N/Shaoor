@@ -416,6 +416,21 @@ export default async function PaperDetailPage({ params }: Props) {
                   </a>
                 ) : null
               )}
+              <a
+                href={`mailto:shouket.tilwani@gmail.com?subject=${encodeURIComponent(`Inquiry regarding Paper: "${paper.title}" (${paper.id})`)}`}
+                className={styles.shareLink}
+                title="Contact Editorial Office regarding this publication"
+              >
+                <Mail size={14} />
+                <div>
+                  <div style={{ fontWeight: "var(--weight-medium)", fontSize: "var(--text-xs)" }}>
+                    Editorial Office Inquiry
+                  </div>
+                  <div style={{ fontSize: "10px", color: "var(--color-neutral-400)" }}>
+                    shouket.tilwani@gmail.com
+                  </div>
+                </div>
+              </a>
             </div>
           </div>
 

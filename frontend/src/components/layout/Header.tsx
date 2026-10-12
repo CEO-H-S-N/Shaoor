@@ -73,6 +73,9 @@ export function Header() {
             <Link href="/team" className={`${styles.navLink} ${isActive("/team") ? styles.navLinkActive : ""}`}>Our Team</Link>
           </li>
           <li>
+            <Link href="/faq" className={`${styles.navLink} ${isActive("/faq") ? styles.navLinkActive : ""}`}>FAQ</Link>
+          </li>
+          <li>
             <Link href="/submit" className={`${styles.navLink} ${isActive("/submit") ? styles.navLinkActive : ""}`}>Submit</Link>
           </li>
         </ul>
@@ -150,6 +153,8 @@ export function Header() {
           <li><Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
           <li><Link href="/guidelines" onClick={() => setMobileMenuOpen(false)}>Guidelines</Link></li>
           <li><Link href="/team" onClick={() => setMobileMenuOpen(false)}>Our Team</Link></li>
+          <li><Link href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link></li>
+          <li><Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
           <li><Link href="/submit" onClick={() => setMobileMenuOpen(false)}>Submit a Paper</Link></li>
           {isLoggedIn ? (
             <li style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>

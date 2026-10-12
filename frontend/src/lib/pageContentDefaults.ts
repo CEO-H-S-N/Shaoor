@@ -114,3 +114,87 @@ export const DEFAULT_JOURNALS_PAGE_CONTENT = {
   emptyStateMessage:
     "The editorial board is currently reviewing inaugural manuscripts for Volume 1, Issue 1. Check back shortly or submit your manuscript today.",
 };
+
+// ─── Default Contact Email ──────────────────────────────────────────
+export const DEFAULT_CONTACT_EMAIL = "shouket.tilwani@gmail.com";
+
+// ─── FAQ Page CMS Interfaces & Defaults ─────────────────────────────
+export interface FaqItem {
+  id: string;
+  question: string;
+  answer: string;
+  category: string;
+}
+
+export interface FaqPageData {
+  title: string;
+  subtitle: string;
+  badge: string;
+  contactHeading: string;
+  contactDescription: string;
+  contactEmail: string;
+  items: FaqItem[];
+}
+
+export const DEFAULT_FAQ_CONTENT: FaqPageData = {
+  title: "Frequently Asked Questions",
+  subtitle:
+    "Comprehensive guidance for authors, peer reviewers, editors, and researchers participating in Shaoor scholarly publishing.",
+  badge: "Author & Researcher Support",
+  contactHeading: "Need Further Editorial Assistance?",
+  contactDescription:
+    "Our editorial office is committed to prompt, transparent communication. For inquiries regarding manuscript status, special volume proposals, or technical assistance, contact the Editor-in-Chief directly.",
+  contactEmail: DEFAULT_CONTACT_EMAIL,
+  items: [
+    {
+      id: "faq-1",
+      category: "Peer Review",
+      question: "How does Shaoor's double-blind peer review process operate?",
+      answer:
+        "Every submitted manuscript undergoes rigorous double-blind peer review. Author identities and affiliations are masked from reviewers, and reviewer identities remain confidential to authors. Each paper is assessed by at least two independent subject-matter specialists evaluating methodology, originality, scientific validity, and ethical rigor before an editorial decision is reached.",
+    },
+    {
+      id: "faq-2",
+      category: "Open Access",
+      question: "Are articles published on Shaoor open access?",
+      answer:
+        "Yes, 100% of publications in Shaoor are published under the Creative Commons Attribution 4.0 International (CC BY 4.0) license. Articles are immediately and permanently free to read, download, distribute, and cite without subscription barriers or embargo periods.",
+    },
+    {
+      id: "faq-3",
+      category: "Fees & Charges",
+      question: "Are there any Article Processing Charges (APCs) or submission fees?",
+      answer:
+        "No. Shaoor operates under a non-commercial open scholarship initiative. There are zero submission fees and zero Article Processing Charges (APCs) required from authors or their institutions.",
+    },
+    {
+      id: "faq-4",
+      category: "Submissions",
+      question: "What file formats and structures are accepted for manuscript submission?",
+      answer:
+        "Manuscripts should be submitted in PDF or Microsoft Word (DOCX) format adhering to standard scholarly conventions: Title, Abstract (200-300 words), Keywords (4-8), Introduction, Materials & Methods, Results, Discussion, and References formatted in APA 7th Edition. High-resolution figures (PNG, JPG, TIFF, SVG) can be uploaded independently in the submission figures studio.",
+    },
+    {
+      id: "faq-5",
+      category: "Timeline",
+      question: "What is the typical turnaround timeline from submission to decision?",
+      answer:
+        "Initial editorial pre-flight screening takes 2 to 3 business days. The comprehensive double-blind peer review phase generally spans 14 to 21 calendar days. Upon receiving reviewer reports, the editorial board issues an official decision (Accept, Revisions, or Decline). Accepted papers are typeset, minted with identifiers, and published rapidly.",
+    },
+    {
+      id: "faq-6",
+      category: "Ethics & AI",
+      question: "What are the policies regarding Artificial Intelligence (AI) and plagiarism?",
+      answer:
+        "Shaoor adheres strictly to COPE (Committee on Publication Ethics) core practices. All submissions undergo automated similarity screening. Generative AI tools cannot be listed as authors; if AI tools were used for data preprocessing or code development, their use must be explicitly declared in the manuscript methodology.",
+    },
+    {
+      id: "faq-7",
+      category: "Editorial Contact",
+      question: "How can authors or institutions contact the Editor-in-Chief directly?",
+      answer:
+        "All official editorial queries, appeal submissions, and journal volume proposals may be directed directly to Editor-in-Chief Dr. Shoukat Tilwani via email at shouket.tilwani@gmail.com.",
+    },
+  ],
+};
+

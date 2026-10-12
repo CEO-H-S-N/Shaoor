@@ -76,7 +76,7 @@ export function Footer() {
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
               <GitBranch size={18} />
             </a>
-            <a href="mailto:contact@shaoor.org" aria-label="Email">
+            <a href="mailto:shouket.tilwani@gmail.com" aria-label="Email">
               <Mail size={18} />
             </a>
           </div>

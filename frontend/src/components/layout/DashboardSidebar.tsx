@@ -15,6 +15,7 @@ import {
   Crown,
   UserCheck,
   BookOpen,
+  HelpCircle,
 } from "lucide-react";
 import styles from "@/app/(dashboard)/layout.module.css";
 
@@ -39,6 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
   { href: "/admin/edit-team", label: "Editorial Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
   { href: "/admin/edit-announcement", label: "Edit Announcement", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-faq", label: "Edit FAQ Page", icon: HelpCircle, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
 ];
 
 interface Props {
