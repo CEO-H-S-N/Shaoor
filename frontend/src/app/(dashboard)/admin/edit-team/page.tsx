@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { TeamEditorView } from "./TeamEditorView";
 
 export const metadata: Metadata = {
-  title: "Edit Our Team — Shaoor",
+  title: "Editorial Team — Shaoor",
   description: "Platform owner portal for managing editorial team members, leadership, and reviewers.",
 };
 
@@ -16,9 +16,9 @@ export default async function EditTeamPage() {
     redirect("/login");
   }
 
-  const role = (session.user as any)?.role;
-  if (role !== "ADMIN" && role !== "DESIGNER") {
-    redirect("/my-papers");
+  const isMaster = !!(session.user as any)?.isMaster || session.user.email === "shouket.tilwani@gmail.com";
+  if (!isMaster) {
+    redirect("/review");
   }
 
   const rawMembers = await prisma.teamMember.findMany({

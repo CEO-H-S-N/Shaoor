@@ -80,12 +80,13 @@ model User {
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  accounts      Account[]
-  sessions      Session[]
-  papers        Paper[]        @relation("AuthorPapers")
-  reviews       Review[]       @relation("ReviewerReviews")
-  notifications Notification[]
-  auditLogs     AuditLog[]
+  accounts        Account[]
+  sessions        Session[]
+  papers          Paper[]        @relation("AuthorPapers")
+  assignedPapers  Paper[]        @relation("AssignedPapers")
+  reviews         Review[]       @relation("ReviewerReviews")
+  notifications   Notification[]
+  auditLogs       AuditLog[]
 
   @@map("users")
 }
@@ -116,6 +117,7 @@ model Paper {
   viewCount   Int         @default(0) @map("view_count")
   downloadCount Int       @default(0) @map("download_count")
   authorId        String      @map("author_id")
+  assignedToId    String?     @map("assigned_to_id")
   submittedAt     DateTime?   @map("submitted_at")
   publishedAt     DateTime?   @map("published_at")
   decisionMessage String?     @map("decision_message") @db.Text
@@ -125,13 +127,16 @@ model Paper {
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
   // Relations
-  author   User           @relation("AuthorPapers", fields: [authorId], references: [id])
-  category Category?      @relation(fields: [categoryId], references: [id])
-  reviews  Review[]
-  versions PaperVersion[]
-  figures  PaperFigure[]
+  author         User           @relation("AuthorPapers", fields: [authorId], references: [id])
+  assignedTo     User?          @relation("AssignedPapers", fields: [assignedToId], references: [id])
+  category       Category?      @relation(fields: [categoryId], references: [id])
+  reviews        Review[]
+  versions       PaperVersion[]
+  figures        PaperFigure[]
+  journalEntries JournalEntry[]
 
   @@index([authorId])
+  @@index([assignedToId])
   @@index([status])
   @@index([categoryId])
   @@index([createdAt(sort: Desc)])
@@ -329,4 +334,44 @@ model Announcement {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("announcements")
+}
+
+// ─── Journals ─────────────────────────────────────────────────
+
+model Journal {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  volume      Int
+  issue       Int
+  coverImage  String?  @map("cover_image")
+  publishedAt DateTime @map("published_at")
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  entries JournalEntry[]
+
+  @@unique([volume, issue])
+  @@index([isActive])
+  @@map("journals")
+}
+
+model JournalEntry {
+  id        String   @id @default(cuid())
+  journalId String   @map("journal_id")
+  paperId   String   @map("paper_id")
+  pageStart Int?     @map("page_start")
+  pageEnd   Int?     @map("page_end")
+  sortOrder Int      @default(0) @map("sort_order")
+  addedAt   DateTime @default(now()) @map("added_at")
+
+  journal Journal @relation(fields: [journalId], references: [id], onDelete: Cascade)
+  paper   Paper   @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@unique([journalId, paperId])
+  @@index([journalId])
+  @@index([paperId])
+  @@map("journal_entries")
 }

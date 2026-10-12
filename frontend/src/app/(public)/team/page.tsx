@@ -98,7 +98,7 @@ export default async function TeamPage() {
               <div style={{ marginTop: "16px" }}>
                 <Link href="/admin/edit-team" className={styles.adminEditBadge}>
                   <FileEdit size={13} />
-                  Edit Our Team (Owner)
+                  Editorial Team (Owner)
                 </Link>
               </div>
             )}

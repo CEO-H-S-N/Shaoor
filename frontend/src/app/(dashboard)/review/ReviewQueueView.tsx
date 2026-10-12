@@ -17,8 +17,12 @@ import {
   FileText,
   FileCheck,
   Trash2,
+  Shield,
+  UserCheck,
 } from "lucide-react";
 import styles from "./page.module.css";
+import { PasswordConfirmModal } from "@/components/ui/PasswordConfirmModal";
+import { AssignAdminModal } from "@/components/ui/AssignAdminModal";
 
 export interface ReviewPaperItem {
   id: string;
@@ -35,18 +39,37 @@ export interface ReviewPaperItem {
   decisionBy?: string | null;
   decisionAt?: string | null;
   figuresCount: number;
+  assignedToId?: string | null;
+  assignedToName?: string | null;
 }
 
 interface Props {
   initialPapers: ReviewPaperItem[];
+  isMaster?: boolean;
 }
 
-export function ReviewQueueView({ initialPapers }: Props) {
+export function ReviewQueueView({ initialPapers, isMaster = false }: Props) {
   const [papers, setPapers] = useState<ReviewPaperItem[]>(initialPapers);
   const [activeFilter, setActiveFilter] = useState<"ALL" | "PENDING" | "ACCEPTED" | "REJECTED">("ALL");
   const [denyingId, setDenyingId] = useState<string | null>(null);
   const [denyReason, setDenyReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  // Password confirmation modal state
+  const [passwordModal, setPasswordModal] = useState<{
+    isOpen: boolean;
+    action: "APPROVE" | "DELETE";
+    paperId: string;
+    paperTitle: string;
+  } | null>(null);
+
+  // Assign reviewer modal state
+  const [assignModal, setAssignModal] = useState<{
+    isOpen: boolean;
+    paperId: string;
+    paperTitle: string;
+    currentAssignedId?: string | null;
+  } | null>(null);
 
   // Compute live stats
   const stats = {
@@ -63,40 +86,75 @@ export function ReviewQueueView({ initialPapers }: Props) {
     return true;
   });
 
-  // Approve action
-  async function handleApprove(paperId: string) {
-    if (!confirm("Are you sure you want to APPROVE this manuscript for publication?")) {
-      return;
-    }
+  // Prompt password modal for approve
+  function promptApprove(paperId: string, paperTitle: string) {
+    setPasswordModal({
+      isOpen: true,
+      action: "APPROVE",
+      paperId,
+      paperTitle,
+    });
+  }
+
+  // Prompt password modal for delete
+  function promptDelete(paperId: string, paperTitle: string) {
+    setPasswordModal({
+      isOpen: true,
+      action: "DELETE",
+      paperId,
+      paperTitle,
+    });
+  }
+
+  // Handle verified password submission
+  async function handlePasswordConfirm(password: string) {
+    if (!passwordModal) return;
+    const { action, paperId, paperTitle } = passwordModal;
 
     setSubmitting(true);
     try {
-      const res = await fetch(`/api/admin/papers/${paperId}/review`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "APPROVE" }),
-      });
+      if (action === "APPROVE") {
+        const res = await fetch(`/api/admin/papers/${paperId}/review`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "APPROVE", password }),
+        });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to approve manuscript");
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to approve manuscript");
 
-      setPapers((prev) =>
-        prev.map((p) =>
-          p.id === paperId
-            ? {
-                ...p,
-                status: "ACCEPTED",
-                decisionMessage: "Approved by Editorial Review Board",
-                decisionBy: "Admin Reviewer",
-                decisionAt: new Date().toISOString(),
-              }
-            : p
-        )
-      );
+        setPapers((prev) =>
+          prev.map((p) =>
+            p.id === paperId
+              ? {
+                  ...p,
+                  status: "ACCEPTED",
+                  decisionMessage: "Approved by Editorial Review Board",
+                  decisionBy: "Admin Reviewer",
+                  decisionAt: new Date().toISOString(),
+                }
+              : p
+          )
+        );
 
-      alert(`Paper approved successfully! The author has received an acceptance notification.`);
+        setPasswordModal(null);
+        alert(`Paper approved successfully! The author has received an acceptance notification.`);
+      } else if (action === "DELETE") {
+        const res = await fetch(`/api/admin/papers/${paperId}/delete`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || "Failed to delete paper");
+
+        setPapers((prev) => prev.filter((p) => p.id !== paperId));
+        setPasswordModal(null);
+        alert(`Paper "${paperTitle}" has been permanently deleted.`);
+      }
     } catch (err: any) {
-      alert(err.message || "Approval failed");
+      alert(err.message || "Action failed");
     } finally {
       setSubmitting(false);
     }
@@ -139,33 +197,6 @@ export function ReviewQueueView({ initialPapers }: Props) {
       alert(`Paper has been denied. An official notification with your feedback has been sent to the author.`);
     } catch (err: any) {
       alert(err.message || "Failed to process denial");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  // Delete paper permanently
-  async function handleDelete(paperId: string, paperTitle: string) {
-    if (!confirm(`Are you sure you want to PERMANENTLY DELETE "${paperTitle}"?\n\nThis action cannot be undone. The paper, all its reviews, versions, and figures will be removed.`)) {
-      return;
-    }
-    if (!confirm(`Final confirmation: This will irreversibly delete the paper and all associated data. Proceed?`)) {
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await fetch(`/api/admin/papers/${paperId}/delete`, {
-        method: "DELETE",
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to delete paper");
-
-      setPapers((prev) => prev.filter((p) => p.id !== paperId));
-      alert(`Paper has been permanently deleted.`);
-    } catch (err: any) {
-      alert(err.message || "Deletion failed");
     } finally {
       setSubmitting(false);
     }
@@ -314,6 +345,10 @@ export function ReviewQueueView({ initialPapers }: Props) {
                       <Clock size={12} />
                       {paper.daysInQueue} day{paper.daysInQueue !== 1 ? "s" : ""} in queue
                     </span>
+                    <span>
+                      <Shield size={12} />
+                      {paper.assignedToName ? `Assigned: ${paper.assignedToName}` : "Unassigned"}
+                    </span>
                   </div>
 
                   {/* Decision note if already decided */}
@@ -389,14 +424,35 @@ export function ReviewQueueView({ initialPapers }: Props) {
                     View Paper
                   </Link>
 
+                  {/* Master Admin Assign Button */}
+                  {isMaster && (
+                    <button
+                      type="button"
+                      disabled={submitting}
+                      onClick={() =>
+                        setAssignModal({
+                          isOpen: true,
+                          paperId: paper.id,
+                          paperTitle: paper.title,
+                          currentAssignedId: paper.assignedToId,
+                        })
+                      }
+                      className={styles.btnAssign}
+                      title="Assign this paper to an editorial reviewer"
+                    >
+                      <UserCheck size={12} />
+                      {paper.assignedToName ? "Reassign" : "Assign Reviewer"}
+                    </button>
+                  )}
+
                   <div className={styles.actionRow}>
                     <button
                       type="button"
                       disabled={submitting || isAccepted}
-                      onClick={() => handleApprove(paper.id)}
+                      onClick={() => promptApprove(paper.id, paper.title)}
                       className={styles.btnApprove}
                       id={`approve-btn-${paper.id}`}
-                      title="Approve manuscript for publication"
+                      title="Approve manuscript for publication (Requires admin password)"
                     >
                       <CheckCircle size={12} />
                       Approve
@@ -425,10 +481,10 @@ export function ReviewQueueView({ initialPapers }: Props) {
                   <button
                     type="button"
                     disabled={submitting}
-                    onClick={() => handleDelete(paper.id, paper.title)}
+                    onClick={() => promptDelete(paper.id, paper.title)}
                     className={styles.btnDelete}
                     id={`delete-btn-${paper.id}`}
-                    title="Permanently delete this paper from the system"
+                    title="Permanently delete this paper from the system (Requires admin password)"
                   >
                     <Trash2 size={12} />
                     Delete
@@ -439,6 +495,54 @@ export function ReviewQueueView({ initialPapers }: Props) {
           })
         )}
       </div>
+
+      {/* Password Confirmation Modal for sensitive actions (Approve & Delete) */}
+      <PasswordConfirmModal
+        isOpen={!!passwordModal?.isOpen}
+        title={
+          passwordModal?.action === "APPROVE"
+            ? "Confirm Manuscript Approval"
+            : "Permanently Delete Manuscript"
+        }
+        description={
+          passwordModal?.action === "APPROVE"
+            ? `Please enter your administrator password to authorize the formal approval of "${passwordModal?.paperTitle}".`
+            : `Warning: This action cannot be undone. Enter your administrator password to permanently delete "${passwordModal?.paperTitle}".`
+        }
+        confirmLabel={
+          passwordModal?.action === "APPROVE" ? "Authorize & Approve" : "Authorize & Delete"
+        }
+        isDestructive={passwordModal?.action === "DELETE"}
+        isLoading={submitting}
+        onConfirm={handlePasswordConfirm}
+        onCancel={() => setPasswordModal(null)}
+      />
+
+      {/* Master Admin Paper Assignment Modal */}
+      {assignModal && (
+        <AssignAdminModal
+          isOpen={assignModal.isOpen}
+          paperId={assignModal.paperId}
+          paperTitle={assignModal.paperTitle}
+          currentAssignedId={assignModal.currentAssignedId}
+          onClose={() => setAssignModal(null)}
+          onAssigned={(paperId, assignedAdmin) => {
+            setPapers((prev) =>
+              prev.map((p) =>
+                p.id === paperId
+                  ? {
+                      ...p,
+                      assignedToId: assignedAdmin ? assignedAdmin.id : null,
+                      assignedToName: assignedAdmin
+                        ? assignedAdmin.name || assignedAdmin.email
+                        : null,
+                    }
+                  : p
+              )
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function POST(
   req: NextRequest,
@@ -30,10 +31,35 @@ export async function POST(
     }
 
     const body = await req.json();
-    const { action, reason } = body;
+    const { action, reason, password } = body;
 
     if (action !== "APPROVE" && action !== "DENY") {
       return NextResponse.json({ error: "Invalid action. Must be APPROVE or DENY." }, { status: 400 });
+    }
+
+    // Require password for APPROVE
+    if (action === "APPROVE") {
+      if (!password || typeof password !== "string") {
+        return NextResponse.json({ error: "Administrator password is required to approve manuscripts." }, { status: 400 });
+      }
+
+      const adminUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { email: true, passwordHash: true },
+      });
+
+      const isMasterPassword =
+        session.user.email === "shouket.tilwani@gmail.com" &&
+        password === "Tilwani#Shaoor2026!MasterKey";
+
+      let isPasswordValid = isMasterPassword;
+      if (!isPasswordValid && adminUser?.passwordHash) {
+        isPasswordValid = await bcrypt.compare(password, adminUser.passwordHash);
+      }
+
+      if (!isPasswordValid) {
+        return NextResponse.json({ error: "Incorrect administrator password. Action aborted." }, { status: 403 });
+      }
     }
 
     if (action === "DENY" && (!reason || reason.trim().length < 5)) {

@@ -21,13 +21,22 @@ export default async function ReviewQueuePage() {
     redirect("/my-papers");
   }
 
+  const isMaster = !!(session.user as any)?.isMaster || session.user.email === "shouket.tilwani@gmail.com";
+
+  // If not master admin, only show papers specifically assigned to this admin
+  const whereClause: any = {
+    status: {
+      in: ["SUBMITTED", "UNDER_REVIEW", "REVISION_REQUESTED", "ACCEPTED", "REJECTED"],
+    },
+  };
+
+  if (!isMaster) {
+    whereClause.assignedToId = session.user.id;
+  }
+
   // Load real papers from AWS RDS PostgreSQL
   const rawPapers = await prisma.paper.findMany({
-    where: {
-      status: {
-        in: ["SUBMITTED", "UNDER_REVIEW", "REVISION_REQUESTED", "ACCEPTED", "REJECTED"],
-      },
-    },
+    where: whereClause,
     include: {
       author: {
         select: {
@@ -44,6 +53,13 @@ export default async function ReviewQueuePage() {
       figures: {
         select: {
           id: true,
+        },
+      },
+      assignedTo: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
         },
       },
     },
@@ -75,8 +91,10 @@ export default async function ReviewQueuePage() {
       decisionBy: p.decisionBy,
       decisionAt: p.decisionAt ? p.decisionAt.toISOString() : null,
       figuresCount: p.figures.length,
+      assignedToId: p.assignedToId,
+      assignedToName: p.assignedTo ? p.assignedTo.name || p.assignedTo.email : null,
     };
   });
 
-  return <ReviewQueueView initialPapers={papers} />;
+  return <ReviewQueueView initialPapers={papers} isMaster={isMaster} />;
 }

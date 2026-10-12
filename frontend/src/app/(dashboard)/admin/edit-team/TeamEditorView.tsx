@@ -208,11 +208,11 @@ export function TeamEditorView({ initialMembers }: Props) {
         <nav className={styles.breadcrumb}>
           <Link href="/my-papers" className={styles.breadcrumbLink}>Dashboard</Link>
           <span className={styles.breadcrumbSep}>/</span>
-          <span className={styles.breadcrumbCurrent}>Edit Our Team</span>
+          <span className={styles.breadcrumbCurrent}>Editorial Team</span>
         </nav>
         <div className={styles.headerText}>
           <div>
-            <h1>Edit Our Team &amp; Editorial Board</h1>
+            <h1>Editorial Team &amp; Board</h1>
             <p className={styles.headerSubtitle}>
               Manage public editorial leadership, board members, academic reviewers, and bios.
             </p>

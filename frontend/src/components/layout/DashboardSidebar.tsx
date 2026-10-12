@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   Crown,
   UserCheck,
+  BookOpen,
 } from "lucide-react";
 import styles from "@/app/(dashboard)/layout.module.css";
 
@@ -31,10 +32,13 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/review", label: "Review Queue", icon: ClipboardList, roles: ["ADMIN", "DESIGNER"] },
   { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"] },
   { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-team", label: "Edit Our Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"] },
-  { href: "/admin/edit-announcement", label: "Edit Announcement", icon: FileEdit, roles: ["ADMIN", "DESIGNER"] },
+  { href: "/admin/journals", label: "Manage Journals", icon: BookOpen, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-journals", label: "Edit Journals Page", icon: BookOpen, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-home", label: "Edit Homepage", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-guidelines", label: "Edit Author Guidelines", icon: BookOpenCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-team", label: "Editorial Team", icon: UserCheck, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/edit-announcement", label: "Edit Announcement", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
 ];
 
 interface Props {

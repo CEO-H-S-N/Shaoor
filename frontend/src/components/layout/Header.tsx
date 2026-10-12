@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X, LogOut, LayoutDashboard } from "lucide-react";
 import { useSplash } from "@/lib/splash-context";
+import { NotificationBell } from "./NotificationBell";
 import styles from "./Header.module.css";
 
 export function Header() {
@@ -57,6 +58,9 @@ export function Header() {
             <Link href="/" className={`${styles.navLink} ${isActive("/") ? styles.navLinkActive : ""}`}>Home</Link>
           </li>
           <li>
+            <Link href="/journals" className={`${styles.navLink} ${isActive("/journals") ? styles.navLinkActive : ""}`}>Journals</Link>
+          </li>
+          <li>
             <Link href="/papers" className={`${styles.navLink} ${isActive("/papers") ? styles.navLinkActive : ""}`}>Papers</Link>
           </li>
           <li>
@@ -77,6 +81,8 @@ export function Header() {
         <div className={styles.authArea}>
           {isLoggedIn ? (
             <div className={styles.authDesktopGroup}>
+              <NotificationBell />
+
               <Link href={dashboardHref} className={styles.dashboardLink} id="header-dashboard-link">
                 <LayoutDashboard size={14} />
                 {dashboardLabel}
@@ -139,6 +145,7 @@ export function Header() {
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ""}`}>
         <ul className={styles.mobileNavLinks}>
           <li><Link href="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
+          <li><Link href="/journals" onClick={() => setMobileMenuOpen(false)}>Journals</Link></li>
           <li><Link href="/papers" onClick={() => setMobileMenuOpen(false)}>Papers</Link></li>
           <li><Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
           <li><Link href="/guidelines" onClick={() => setMobileMenuOpen(false)}>Guidelines</Link></li>

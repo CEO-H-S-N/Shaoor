@@ -333,6 +333,34 @@
   cursor: not-allowed;
 }
 
+.btnAssign {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #eff6ff;
+  color: #1e3a8a;
+  border: 1px solid #bfdbfe;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  margin-top: 4px;
+  width: 100%;
+  justify-content: center;
+}
+
+.btnAssign:hover:not(:disabled) {
+  background: #dbeafe;
+  border-color: #93c5fd;
+}
+
+.btnAssign:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .reasonModal {
   margin-top: 14px;
   padding: 16px;

@@ -1,5 +1,6 @@
-// Default CMS content templates for Public Pages (About & Author Guidelines)
+// Default CMS content templates for Public Pages (About, Author Guidelines, Homepage, Journals)
 // These serve as initial templates and fallbacks if database content has not been edited yet.
+// Safe for both Client and Server components (zero node/db dependencies).
 
 export interface PageSection {
   id: string;
@@ -87,4 +88,29 @@ export const DEFAULT_GUIDELINES_CONTENT: PageTemplateData = {
         "All manuscripts must be submitted electronically via the Shaoor Author Portal (/submit):\n\n1. Initial Pre-Flight Editorial Screening (2–3 business days)\n2. Double-Blind Peer Review by 2+ Independent Specialists (14–21 days)\n3. Editorial Decision: Accept, Minor Revision, Major Revision, or Decline\n4. Revision Window: Authors are given 21 days for revisions\n5. Typesetting, DOI Minting, and Rapid Open-Access Publication upon acceptance.",
     },
   ],
+};
+
+export const DEFAULT_HOMEPAGE_CONTENT = {
+  title: "Publish Impactful Research.",
+  subtitle: "Peer-Reviewed & Open to the World.",
+  description:
+    "Shaoor is a peer-reviewed scholarly publishing platform built for researchers, authors, and academics. Experience transparent double-blind review, open access indexing, and AI-powered academic guidance.",
+};
+
+export const DEFAULT_JOURNALS_PAGE_CONTENT = {
+  title: "Shaoor Journal of Multidisciplinary Sciences",
+  subtitle:
+    "Peer-reviewed volumes bridging fundamental theoretical foundations with pioneering applied research across the sciences, technology, and medicine.",
+  badge: "Open Access Scholarly Archives",
+  metric1Label: "Peer Review Standard",
+  metric1Value: "Double-Blind",
+  metric2Label: "CC-BY 4.0 International",
+  metric2Value: "Open Access",
+  metric3Label: "Issue Frequency",
+  metric3Value: "Quarterly",
+  archiveHeading: "Published Volumes & Issues",
+  archiveSubheading: "Browse complete catalogued journal archives and individual papers.",
+  emptyStateTitle: "No Published Issues Currently Available",
+  emptyStateMessage:
+    "The editorial board is currently reviewing inaugural manuscripts for Volume 1, Issue 1. Check back shortly or submit your manuscript today.",
 };

@@ -25,9 +25,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const role = (session.user as any)?.role;
-    if (role !== "ADMIN" && role !== "DESIGNER") {
-      return NextResponse.json({ error: "Forbidden. Admin privileges required." }, { status: 403 });
+    const isMaster = !!(session.user as any)?.isMaster || session.user.email === "shouket.tilwani@gmail.com";
+    if (!isMaster) {
+      return NextResponse.json({ error: "Forbidden. Platform owner privileges required to modify announcement." }, { status: 403 });
     }
 
     const body = await req.json();

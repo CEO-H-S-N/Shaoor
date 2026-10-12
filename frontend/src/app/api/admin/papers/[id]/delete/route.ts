@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 export async function DELETE(
   req: NextRequest,
@@ -15,6 +16,39 @@ export async function DELETE(
     const role = (session.user as any)?.role;
     if (role !== "ADMIN" && role !== "DESIGNER") {
       return NextResponse.json({ error: "Forbidden. Admin privileges required." }, { status: 403 });
+    }
+
+    let password = "";
+    try {
+      const body = await req.json();
+      password = body?.password || "";
+    } catch {
+      // Body might be missing
+    }
+
+    if (!password) {
+      return NextResponse.json(
+        { error: "Administrator password is required to permanently delete a manuscript." },
+        { status: 400 }
+      );
+    }
+
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { email: true, passwordHash: true },
+    });
+
+    const isMasterPassword =
+      session.user.email === "shouket.tilwani@gmail.com" &&
+      password === "Tilwani#Shaoor2026!MasterKey";
+
+    let isPasswordValid = isMasterPassword;
+    if (!isPasswordValid && adminUser?.passwordHash) {
+      isPasswordValid = await bcrypt.compare(password, adminUser.passwordHash);
+    }
+
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: "Incorrect administrator password. Action aborted." }, { status: 403 });
     }
 
     const resolved = await Promise.resolve(params);

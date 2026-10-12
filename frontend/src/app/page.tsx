@@ -46,8 +46,8 @@ export default async function HomePage() {
   try {
     const [published, popular] = await Promise.all([
       prisma.paper.findMany({
-        where: { status: "ACCEPTED" },
-        orderBy: { decisionAt: "desc" },
+        where: { status: { in: ["ACCEPTED", "PUBLISHED"] } },
+        orderBy: [{ publishedAt: "desc" }, { decisionAt: "desc" }, { createdAt: "desc" }],
         take: 8,
         include: {
           category: { select: { name: true, color: true } },
@@ -55,8 +55,8 @@ export default async function HomePage() {
         },
       }),
       prisma.paper.findMany({
-        where: { status: "ACCEPTED" },
-        orderBy: { viewCount: "desc" },
+        where: { status: { in: ["ACCEPTED", "PUBLISHED"] } },
+        orderBy: [{ viewCount: "desc" }, { createdAt: "desc" }],
         take: 8,
         include: {
           category: { select: { name: true, color: true } },
@@ -92,6 +92,36 @@ export default async function HomePage() {
     // Silent fallback — no announcement
   }
 
+  // Fetch homepage content (managed by master admin)
+  let heroContent = {
+    title: "Publish Impactful Research.",
+    subtitle: "Peer-Reviewed & Open to the World.",
+    description:
+      "Shaoor is a peer-reviewed scholarly publishing platform built for researchers, authors, and academics. Experience transparent double-blind review, open access indexing, and AI-powered academic guidance.",
+  };
+
+  try {
+    const homePageRow = await prisma.pageContent.findUnique({
+      where: { slug: "homepage" },
+    });
+    if (homePageRow) {
+      let desc = heroContent.description;
+      try {
+        const parsed = JSON.parse(homePageRow.content);
+        if (parsed.description) desc = parsed.description;
+      } catch {
+        if (homePageRow.content) desc = homePageRow.content;
+      }
+      heroContent = {
+        title: homePageRow.title || heroContent.title,
+        subtitle: homePageRow.subtitle || heroContent.subtitle,
+        description: desc,
+      };
+    }
+  } catch (err) {
+    console.error("Failed to load homepage text from database:", err);
+  }
+
   // Ensure plenty of cards so the track is always completely populated across all screen sizes
   function makeLoopList<T>(items: T[], minLength = 12): T[] {
     if (items.length === 0) return [];
@@ -122,14 +152,14 @@ export default async function HomePage() {
           <div className={styles.heroContainer}>
             <div className={styles.heroTextOnly}>
               <h1 className={styles.heroTitle}>
-                Publish Impactful Research.
-                <span className={styles.heroTitleAccent}>Peer-Reviewed & Open to the World.</span>
+                {heroContent.title}
+                {heroContent.subtitle && (
+                  <span className={styles.heroTitleAccent}>{heroContent.subtitle}</span>
+                )}
               </h1>
 
               <p className={styles.heroDescription}>
-                Shaoor is a peer-reviewed scholarly publishing platform built for researchers,
-                authors, and academics. Experience transparent double-blind review,
-                open access indexing, and AI-powered academic guidance.
+                {heroContent.description}
               </p>
             </div>
           </div>
