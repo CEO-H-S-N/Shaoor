@@ -24,6 +24,9 @@ import {
   Info,
   X,
   Loader2,
+  Plus,
+  BookOpen,
+  Settings as SettingsIcon,
 } from "lucide-react";
 import styles from "./settings.module.css";
 
@@ -91,7 +94,7 @@ interface Props {
 
 export function SettingsForm({ initialUser }: Props) {
   const router = useRouter();
-  const { update: updateSession } = useSession();
+  const { update: updateSession, data: session } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State
@@ -362,6 +365,45 @@ export function SettingsForm({ initialUser }: Props) {
           >
             <X size={15} />
           </button>
+        </div>
+      )}
+
+      {/* ─── Master Admin Journal Studio Card ─── */}
+      {(initialUser.email === "shouket.tilwani@gmail.com" || (session?.user as any)?.isMaster) && (
+        <div className={styles.masterStudioCard}>
+          <div className={styles.masterStudioHeader}>
+            <div>
+              <span className={styles.masterStudioBadge}>
+                👑 Master Admin Publication Studio
+              </span>
+              <h2 className={styles.masterStudioTitle}>
+                Journal Management &amp; Content Categorization
+              </h2>
+              <p className={styles.masterStudioSubtitle}>
+                Add new academic journals to the platform, configure names and volumes, and choose which manuscripts belong in each journal.
+              </p>
+            </div>
+            <div className={styles.masterStudioActions}>
+              <Link
+                href="/admin/journals?create=true"
+                className={styles.masterStudioPrimaryBtn}
+              >
+                <Plus size={15} /> Add New Journal
+              </Link>
+              <Link
+                href="/admin/journals"
+                className={styles.masterStudioSecondaryBtn}
+              >
+                <BookOpen size={14} /> Manage All Journals
+              </Link>
+              <Link
+                href="/admin/edit-journals"
+                className={styles.masterStudioSecondaryBtn}
+              >
+                <SettingsIcon size={14} /> Edit Content Intro
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 

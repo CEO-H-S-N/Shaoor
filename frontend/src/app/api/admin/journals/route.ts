@@ -80,6 +80,18 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // If paperIds provided, assign them to this journal
+    if (Array.isArray(body.paperIds) && body.paperIds.length > 0) {
+      await prisma.journalEntry.createMany({
+        data: body.paperIds.map((pid: string, idx: number) => ({
+          journalId: journal.id,
+          paperId: pid,
+          sortOrder: idx,
+        })),
+        skipDuplicates: true,
+      });
+    }
+
     // Audit log
     await prisma.auditLog.create({
       data: {

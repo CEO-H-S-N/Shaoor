@@ -98,18 +98,18 @@ export const DEFAULT_HOMEPAGE_CONTENT = {
 };
 
 export const DEFAULT_JOURNALS_PAGE_CONTENT = {
-  title: "Shaoor Journal of Multidisciplinary Sciences",
+  title: "Shaoor Academic Journals",
   subtitle:
-    "Peer-reviewed volumes bridging fundamental theoretical foundations with pioneering applied research across the sciences, technology, and medicine.",
-  badge: "Open Access Scholarly Archives",
+    "Explore peer-reviewed open access scholarly journals published on Shaoor. Dedicated international platforms advancing multidisciplinary research, scientific discovery, medicine, technology, humanities, and social inquiry.",
+  badge: "Scholarly Journals & Archives",
   metric1Label: "Peer Review Standard",
   metric1Value: "Double-Blind",
   metric2Label: "CC-BY 4.0 International",
   metric2Value: "Open Access",
   metric3Label: "Issue Frequency",
   metric3Value: "Quarterly",
-  archiveHeading: "Published Volumes & Issues",
-  archiveSubheading: "Browse complete catalogued journal archives and individual papers.",
+  archiveHeading: "Academic Journals on Shaoor",
+  archiveSubheading: "Browse complete catalogued journals, published volumes, and individual papers.",
   emptyStateTitle: "No Published Issues Currently Available",
   emptyStateMessage:
     "The editorial board is currently reviewing inaugural manuscripts for Volume 1, Issue 1. Check back shortly or submit your manuscript today.",

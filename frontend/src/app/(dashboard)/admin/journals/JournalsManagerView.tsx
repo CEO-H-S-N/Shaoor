@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   BookOpen,
@@ -17,6 +17,8 @@ import {
   Sparkles,
   Settings,
   Globe,
+  Search,
+  Check,
 } from "lucide-react";
 import styles from "./journals.module.css";
 
@@ -33,16 +35,34 @@ export interface JournalItem {
   papersCount: number;
 }
 
-export function JournalsManagerView({ initialJournals }: { initialJournals: JournalItem[] }) {
+export interface PaperOption {
+  id: string;
+  title: string;
+  categoryName: string;
+  authorName: string;
+}
+
+interface Props {
+  initialJournals: JournalItem[];
+  availablePapers?: PaperOption[];
+  autoOpenCreate?: boolean;
+}
+
+export function JournalsManagerView({
+  initialJournals,
+  availablePapers = [],
+  autoOpenCreate = false,
+}: Props) {
   const [journals, setJournals] = useState<JournalItem[]>(initialJournals);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
 
   // Form State
-  const [title, setTitle] = useState("Shaoor Journal of Multidisciplinary Sciences");
+  const [title, setTitle] = useState("Shaoor Journal of ");
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [volume, setVolume] = useState<number>(1);
@@ -50,22 +70,36 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
   const [publishedAt, setPublishedAt] = useState(new Date().toISOString().split("T")[0]);
   const [isActive, setIsActive] = useState(true);
 
+  // Paper Selection State
+  const [selectedPaperIds, setSelectedPaperIds] = useState<string[]>([]);
+  const [paperFilterQuery, setPaperFilterQuery] = useState("");
+
   const openCreateModal = () => {
     setEditingId(null);
     setTitle("Shaoor Journal of ");
     setSlug("");
     setDescription("");
-    // Autoincrement issue if journals exist
-    const latestIssue = journals.length > 0 ? Math.max(...journals.map((j) => j.issue)) + 1 : 1;
-    setVolume(journals.length > 0 ? journals[0].volume : 1);
-    setIssue(latestIssue);
+    setSelectedPaperIds([]);
+    setPaperFilterQuery("");
+    setNewlyCreatedId(null);
+
+    // Default volume & issue
+    const latestVolume = journals.length > 0 ? Math.max(...journals.map((j) => j.volume)) : 1;
+    setVolume(latestVolume);
+    setIssue(1);
     setPublishedAt(new Date().toISOString().split("T")[0]);
     setIsActive(true);
     setError(null);
     setIsModalOpen(true);
   };
 
-  const openEditModal = (j: JournalItem) => {
+  useEffect(() => {
+    if (autoOpenCreate) {
+      openCreateModal();
+    }
+  }, [autoOpenCreate]);
+
+  const openEditModal = async (j: JournalItem) => {
     setEditingId(j.id);
     setTitle(j.title);
     setSlug(j.slug || "");
@@ -74,8 +108,51 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
     setIssue(j.issue);
     setPublishedAt(new Date(j.publishedAt).toISOString().split("T")[0]);
     setIsActive(j.isActive);
+    setPaperFilterQuery("");
     setError(null);
+    setNewlyCreatedId(null);
+
+    // Fetch existing paper entries for this journal
+    try {
+      const res = await fetch(`/api/admin/journals/${j.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.journal?.entries) {
+          setSelectedPaperIds(data.journal.entries.map((e: any) => e.paperId));
+        }
+      }
+    } catch {
+      // Fallback
+    }
+
     setIsModalOpen(true);
+  };
+
+  // Filter available papers inside modal
+  const filteredAvailablePapers = useMemo(() => {
+    if (!paperFilterQuery.trim()) return availablePapers;
+    const q = paperFilterQuery.toLowerCase();
+    return availablePapers.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.categoryName.toLowerCase().includes(q) ||
+        p.authorName.toLowerCase().includes(q)
+    );
+  }, [availablePapers, paperFilterQuery]);
+
+  const togglePaperSelection = (paperId: string) => {
+    setSelectedPaperIds((prev) =>
+      prev.includes(paperId) ? prev.filter((id) => id !== paperId) : [...prev, paperId]
+    );
+  };
+
+  const selectAllFilteredPapers = () => {
+    const ids = filteredAvailablePapers.map((p) => p.id);
+    setSelectedPaperIds((prev) => Array.from(new Set([...prev, ...ids])));
+  };
+
+  const clearAllSelectedPapers = () => {
+    setSelectedPaperIds([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +175,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
           issue,
           publishedAt,
           isActive,
+          paperIds: selectedPaperIds,
         }),
       });
 
@@ -117,11 +195,12 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   issue,
                   publishedAt,
                   isActive,
+                  papersCount: selectedPaperIds.length,
                 }
               : item
           )
         );
-        setSuccess("Journal updated successfully!");
+        setSuccess(`Journal "${title}" updated with ${selectedPaperIds.length} assigned paper(s)!`);
       } else {
         const newJournal: JournalItem = {
           id: data.journal.id,
@@ -133,14 +212,14 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
           coverImage: data.journal.coverImage,
           publishedAt: data.journal.publishedAt,
           isActive: data.journal.isActive,
-          papersCount: 0,
+          papersCount: selectedPaperIds.length,
         };
         setJournals([newJournal, ...journals]);
-        setSuccess(`Journal "${title}" created successfully!`);
+        setNewlyCreatedId(data.journal.id);
+        setSuccess(`Journal "${title}" created successfully with ${selectedPaperIds.length} paper(s)!`);
       }
 
       setIsModalOpen(false);
-      setTimeout(() => setSuccess(null), 4000);
     } catch (err: any) {
       setError(err.message || "Failed to process request");
     } finally {
@@ -149,7 +228,11 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
   };
 
   const handleDelete = async (journalId: string, journalTitle: string) => {
-    if (!confirm(`Are you sure you want to delete "${journalTitle}"? Any paper associations will be unlinked. This action cannot be undone.`)) {
+    if (
+      !confirm(
+        `Are you sure you want to delete "${journalTitle}"? Any paper associations will be unlinked. This action cannot be undone.`
+      )
+    ) {
       return;
     }
 
@@ -202,20 +285,49 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
         </div>
         <h1 className={styles.title}>Journals &amp; Paper Categorization</h1>
         <p className={styles.subtitle}>
-          Create and manage academic journals on Shaoor, categorize and assign manuscripts into journals, and configure URLs for <code>/shaoor/[journal-name]</code>.
+          Add new scholarly journals, edit volumes and issues, and choose which manuscripts belong in each journal. Each journal is automatically accessible at <code>/shaoor/[journal-name]</code>.
         </p>
       </div>
 
       {/* ── Feedback Alerts ────────────────────────────────── */}
-      {success && <div className={styles.alertSuccess}><CheckCircle size={16} /> {success}</div>}
+      {success && (
+        <div className={styles.alertSuccess} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <CheckCircle size={16} />
+            <span>{success}</span>
+          </div>
+          {newlyCreatedId && (
+            <Link
+              href={`/admin/journals/${newlyCreatedId}`}
+              style={{
+                fontSize: "0.82rem",
+                fontWeight: 700,
+                color: "#1e3a8a",
+                background: "#ffffff",
+                padding: "4px 10px",
+                borderRadius: 4,
+                border: "1px solid #bfdbfe",
+                textDecoration: "none",
+              }}
+            >
+              Adjust Paper Order &amp; Page Numbers →
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* ── Journals Grid ──────────────────────────────────── */}
       {journals.length === 0 ? (
         <div className={styles.emptyState}>
           <BookOpen size={48} className={styles.emptyIcon} />
           <h3>No Journals in Database</h3>
-          <p>Create your inaugural academic journal to begin compiling and categorizing accepted papers.</p>
-          <button type="button" className={styles.createBtn} onClick={openCreateModal} style={{ margin: "16px auto 0 auto" }}>
+          <p>Create your inaugural academic journal and select papers to include.</p>
+          <button
+            type="button"
+            className={styles.createBtn}
+            onClick={openCreateModal}
+            style={{ margin: "16px auto 0 auto" }}
+          >
             <Plus size={15} /> Add First Journal
           </button>
         </div>
@@ -269,7 +381,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   <Link
                     href={`/admin/journals/${journal.id}`}
                     className={styles.managePapersBtn}
-                    title="Assign, reorder, or remove papers in this journal"
+                    title="Fine-tune paper order, page ranges, or add/remove papers"
                   >
                     <Sparkles size={13} /> Categorize Papers ({journal.papersCount})
                   </Link>
@@ -286,7 +398,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                     type="button"
                     className={styles.iconBtn}
                     onClick={() => openEditModal(journal)}
-                    title="Edit Journal Name & Settings"
+                    title="Edit Journal Name, Volume & Papers"
                   >
                     <Edit2 size={14} />
                   </button>
@@ -308,9 +420,20 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
       {/* ── Create / Edit Modal ─────────────────────────────── */}
       {isModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modal}
+            style={{ maxWidth: 680, maxHeight: "90vh", overflowY: "auto" }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalHeader}>
-              <h3>{editingId ? "Edit Journal Details" : "Create New Academic Journal"}</h3>
+              <div>
+                <h3 style={{ margin: 0 }}>
+                  {editingId ? "Edit Journal Details & Papers" : "Add New Academic Journal"}
+                </h3>
+                <p style={{ margin: "4px 0 0 0", fontSize: "0.8rem", color: "#64748b" }}>
+                  Configure the journal title, volume, issue, and choose which manuscripts to include.
+                </p>
+              </div>
               <button
                 type="button"
                 className={styles.closeBtn}
@@ -330,7 +453,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Shaoor Journal of Health & Medical Sciences"
+                  placeholder="e.g. Shaoor Journal of Science"
                   required
                 />
               </div>
@@ -342,7 +465,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   type="text"
                   value={slug}
                   onChange={(e) => setSlug(e.target.value)}
-                  placeholder="e.g. health-medical-sciences (auto-generated if empty)"
+                  placeholder="e.g. shaoor-journal-of-science (auto-generated if empty)"
                 />
               </div>
 
@@ -383,14 +506,94 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="j-desc">Journal Scope &amp; Editorial Description</label>
+                <label htmlFor="j-desc">Journal Scope &amp; Editorial Content</label>
                 <textarea
                   id="j-desc"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Focus areas, disciplinary scope, research topics..."
+                  placeholder="Aims, disciplinary scope, research topics and themes covered by this journal..."
                 />
+              </div>
+
+              {/* ── Choose Papers for this Journal ───────────── */}
+              <div className={styles.paperSelectionBox}>
+                <div className={styles.paperSelectionHeader}>
+                  <div className={styles.paperSelectionTitle}>
+                    <FileText size={14} style={{ color: "#1e3a8a" }} />
+                    <span>Choose Papers to Add ({selectedPaperIds.length} Selected)</span>
+                  </div>
+                  <div className={styles.paperSelectionActions}>
+                    <button
+                      type="button"
+                      className={styles.toggleSelectBtn}
+                      onClick={selectAllFilteredPapers}
+                    >
+                      Select All Filtered
+                    </button>
+                    {selectedPaperIds.length > 0 && (
+                      <button
+                        type="button"
+                        className={styles.toggleSelectBtn}
+                        onClick={clearAllSelectedPapers}
+                        style={{ color: "#dc2626", borderColor: "#fecaca", background: "#fef2f2" }}
+                      >
+                        Clear Selection
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <input
+                  type="text"
+                  placeholder="Filter available papers by title, author, or discipline..."
+                  className={styles.paperSearchInput}
+                  value={paperFilterQuery}
+                  onChange={(e) => setPaperFilterQuery(e.target.value)}
+                />
+
+                {availablePapers.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "16px", color: "#64748b", fontSize: "0.8rem" }}>
+                    No accepted or published papers available yet.
+                  </div>
+                ) : filteredAvailablePapers.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "16px", color: "#64748b", fontSize: "0.8rem" }}>
+                    No papers match &quot;{paperFilterQuery}&quot;.
+                  </div>
+                ) : (
+                  <div className={styles.paperScrollList}>
+                    {filteredAvailablePapers.map((paper) => {
+                      const isSelected = selectedPaperIds.includes(paper.id);
+                      return (
+                        <div
+                          key={paper.id}
+                          className={`${styles.paperOptionRow} ${
+                            isSelected ? styles.paperOptionRowSelected : ""
+                          }`}
+                          onClick={() => togglePaperSelection(paper.id)}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => {}} // Handled by parent div
+                            className={styles.paperOptionCheckbox}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div className={styles.paperOptionDetails}>
+                            <div className={styles.paperOptionTitle}>{paper.title}</div>
+                            <div className={styles.paperOptionMeta}>
+                              <span className={styles.paperOptionCategory}>
+                                {paper.categoryName}
+                              </span>
+                              <span>•</span>
+                              <span>By {paper.authorName}</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               <div className={styles.checkboxGroup}>
@@ -418,7 +621,11 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   className={styles.submitBtn}
                   disabled={submitting}
                 >
-                  {submitting ? "Saving..." : editingId ? "Update Journal" : "Create Journal"}
+                  {submitting
+                    ? "Saving..."
+                    : editingId
+                    ? "Save Changes"
+                    : `Create Journal with ${selectedPaperIds.length} Paper(s)`}
                 </button>
               </div>
             </form>

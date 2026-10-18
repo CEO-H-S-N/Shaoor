@@ -81,6 +81,33 @@ export async function PUT(
       data: updateData,
     });
 
+    if (Array.isArray(body.paperIds)) {
+      await prisma.journalEntry.deleteMany({
+        where: {
+          journalId,
+          paperId: { notIn: body.paperIds },
+        },
+      });
+
+      const existingEntries = await prisma.journalEntry.findMany({
+        where: { journalId },
+        select: { paperId: true },
+      });
+      const existingIds = new Set(existingEntries.map((e) => e.paperId));
+      const toAdd = body.paperIds.filter((pid: string) => !existingIds.has(pid));
+
+      if (toAdd.length > 0) {
+        await prisma.journalEntry.createMany({
+          data: toAdd.map((pid: string, idx: number) => ({
+            journalId,
+            paperId: pid,
+            sortOrder: existingIds.size + idx,
+          })),
+          skipDuplicates: true,
+        });
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: "Journal updated successfully.",
