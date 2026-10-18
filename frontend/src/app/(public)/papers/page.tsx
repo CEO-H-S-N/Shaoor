@@ -14,6 +14,7 @@ import {
 import { prisma } from "@/lib/prisma";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { JournalFilterSelect } from "./JournalFilterSelect";
 import styles from "./page.module.css";
 
 export const metadata: Metadata = {
@@ -37,6 +38,19 @@ const getCachedCategories = unstable_cache(
   { revalidate: 3600, tags: ["categories"] }
 );
 
+// Cache journals for filter dropdown — 0ms database latency
+const getCachedJournals = unstable_cache(
+  async () => {
+    return prisma.journal.findMany({
+      where: { isActive: true },
+      orderBy: [{ volume: "desc" }, { issue: "desc" }],
+      select: { id: true, title: true, slug: true, volume: true, issue: true },
+    });
+  },
+  ["all-journals-list-filter"],
+  { revalidate: 3600, tags: ["journals"] }
+);
+
 // Cache most-viewed papers for 60 seconds — 0ms database latency
 const getCachedMostViewed = unstable_cache(
   async () => {
@@ -58,6 +72,7 @@ interface PageProps {
   searchParams: Promise<{
     q?: string;
     category?: string;
+    journal?: string;
     sort?: string;
     letter?: string;
     page?: string;
@@ -112,6 +127,7 @@ export default async function PapersPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const query = params.q?.trim() || "";
   const selectedCategory = params.category || "all";
+  const selectedJournal = params.journal || "all";
   const sort = params.sort || "newest";
   const letter = params.letter?.toUpperCase() || "";
   const page = Math.max(1, parseInt(params.page || "1", 10));
@@ -126,11 +142,34 @@ export default async function PapersPage({ searchParams }: PageProps) {
       { abstract: { contains: query, mode: "insensitive" } },
       { keywords: { has: query } },
       { author: { name: { contains: query, mode: "insensitive" } } },
+      {
+        journalEntries: {
+          some: {
+            journal: {
+              title: { contains: query, mode: "insensitive" },
+            },
+          },
+        },
+      },
     ];
   }
 
   if (selectedCategory !== "all") {
     where.category = { slug: selectedCategory };
+  }
+
+  if (selectedJournal !== "all") {
+    where.journalEntries = {
+      some: {
+        journal: {
+          OR: [
+            { slug: selectedJournal },
+            { id: selectedJournal },
+            { title: { equals: selectedJournal, mode: "insensitive" } },
+          ],
+        },
+      },
+    };
   }
 
   if (letter && /^[A-Z]$/.test(letter)) {
@@ -145,8 +184,9 @@ export default async function PapersPage({ searchParams }: PageProps) {
   else if (sort === "za") orderBy = { title: "desc" };
 
   // Fetch all in a single parallel roundtrip over persistent pool
-  const [categories, papers, total, mostViewedPapers] = await Promise.all([
+  const [categories, journals, papers, total, mostViewedPapers] = await Promise.all([
     getCachedCategories(),
+    getCachedJournals(),
     prisma.paper.findMany({
       where,
       orderBy,
@@ -158,6 +198,14 @@ export default async function PapersPage({ searchParams }: PageProps) {
         },
         category: {
           select: { name: true, slug: true, color: true },
+        },
+        journalEntries: {
+          take: 1,
+          include: {
+            journal: {
+              select: { id: true, title: true, slug: true, volume: true, issue: true },
+            },
+          },
         },
       },
     }),
@@ -172,6 +220,7 @@ export default async function PapersPage({ searchParams }: PageProps) {
     const merged = {
       ...(query ? { q: query } : {}),
       ...(selectedCategory !== "all" ? { category: selectedCategory } : {}),
+      ...(selectedJournal !== "all" ? { journal: selectedJournal } : {}),
       ...(sort !== "newest" ? { sort } : {}),
       ...(letter ? { letter } : {}),
       ...overrides,
@@ -200,6 +249,9 @@ export default async function PapersPage({ searchParams }: PageProps) {
               {selectedCategory !== "all" && (
                 <input type="hidden" name="category" value={selectedCategory} />
               )}
+              {selectedJournal !== "all" && (
+                <input type="hidden" name="journal" value={selectedJournal} />
+              )}
               {sort !== "newest" && <input type="hidden" name="sort" value={sort} />}
               <div className={styles.searchInputWrapper}>
                 <BookOpen size={20} className={styles.searchIcon} />
@@ -207,7 +259,7 @@ export default async function PapersPage({ searchParams }: PageProps) {
                   id="paper-search-input"
                   name="q"
                   type="search"
-                  placeholder="Enter a keyword or subject to search"
+                  placeholder="Enter a keyword, journal title, or author to search"
                   className={styles.searchInput}
                   defaultValue={query}
                   autoComplete="off"
@@ -253,8 +305,14 @@ export default async function PapersPage({ searchParams }: PageProps) {
                 </div>
               </nav>
 
-              {/* Filters Bar: Alphabet / Sort Options */}
+              {/* Filters Bar: Journal Selector, Alphabet & Sort Options */}
               <div className={styles.filterControlsBar}>
+                {/* Journal Filter Selector */}
+                <JournalFilterSelect
+                  journals={journals}
+                  selectedJournal={selectedJournal}
+                />
+
                 <div className={styles.sortDropdownWrapper}>
                   <span className={styles.sortLabel}>Sort:</span>
                   <div className={styles.sortOptions}>
@@ -320,17 +378,17 @@ export default async function PapersPage({ searchParams }: PageProps) {
                     <BookOpen size={48} />
                   </div>
                   <h3 className={styles.emptyTitle}>
-                    {query || selectedCategory !== "all" || letter
+                    {query || selectedCategory !== "all" || selectedJournal !== "all" || letter
                       ? "No published papers match your criteria"
                       : "No published papers in the library yet"}
                   </h3>
                   <p className={styles.emptyText}>
-                    {query || selectedCategory !== "all" || letter
-                      ? "Try adjusting your search keywords, switching categories, or clearing active filters."
+                    {query || selectedCategory !== "all" || selectedJournal !== "all" || letter
+                      ? "Try adjusting your search keywords, switching journals, or clearing active filters."
                       : "When researchers submit and pass peer review on Shaoor, their open access papers will appear here."}
                   </p>
                   <div className={styles.emptyActions}>
-                    {(query || selectedCategory !== "all" || letter) && (
+                    {(query || selectedCategory !== "all" || selectedJournal !== "all" || letter) && (
                       <Link href="/papers" className={styles.resetBtn}>
                         <RotateCcw size={16} />
                         Reset all filters
@@ -350,6 +408,8 @@ export default async function PapersPage({ searchParams }: PageProps) {
                         bg: "linear-gradient(135deg, #18181b 0%, #3f3f46 100%)",
                         iconText: "JR",
                       };
+
+                    const assignedJournal = paper.journalEntries?.[0]?.journal;
 
                     return (
                       <article key={paper.id} className={styles.paperRow}>
@@ -400,6 +460,21 @@ export default async function PapersPage({ searchParams }: PageProps) {
                                 {paper.category.name}
                               </span>
                             )}
+
+                            {/* Direct Journal Badge Link */}
+                            {assignedJournal && (
+                              <Link
+                                href={`/shaoor/${encodeURIComponent(assignedJournal.slug || assignedJournal.id)}`}
+                                className={styles.journalBadgeLink}
+                                title={`View published journal: ${assignedJournal.title}`}
+                              >
+                                <BookOpen size={11} />
+                                <span>
+                                  {assignedJournal.title} (Vol. {assignedJournal.volume}, Iss. {assignedJournal.issue})
+                                </span>
+                              </Link>
+                            )}
+
                             <span className={styles.metaDot}>•</span>
                             <span>v{paper.version}</span>
                             <span className={styles.metaDot}>•</span>
