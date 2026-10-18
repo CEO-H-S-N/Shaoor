@@ -62,10 +62,13 @@ export async function PUT(
     const journalId = resolved.id;
 
     const body = await req.json();
-    const { title, description, volume, issue, coverImage, publishedAt, isActive } = body;
+    const { title, slug, description, volume, issue, coverImage, publishedAt, isActive } = body;
 
     const updateData: any = {};
     if (title) updateData.title = title.trim();
+    if (slug) {
+      updateData.slug = slug.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    }
     if (description !== undefined) updateData.description = description ? description.trim() : null;
     if (volume !== undefined) updateData.volume = parseInt(volume, 10);
     if (issue !== undefined) updateData.issue = parseInt(issue, 10);

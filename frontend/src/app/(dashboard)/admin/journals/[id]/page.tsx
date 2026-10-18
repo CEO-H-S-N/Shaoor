@@ -90,6 +90,7 @@ export default async function JournalDetailPage({
       journal={{
         id: journal.id,
         title: journal.title,
+        slug: journal.slug,
         volume: journal.volume,
         issue: journal.issue,
         description: journal.description,

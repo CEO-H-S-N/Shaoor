@@ -38,40 +38,31 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { title, description, volume, issue, coverImage, publishedAt, isActive } = body;
+    const { title, slug, description, volume, issue, coverImage, publishedAt, isActive } = body;
 
-    if (!title || volume === undefined || issue === undefined) {
+    if (!title) {
       return NextResponse.json(
-        { error: "Title, Volume, and Issue are required." },
+        { error: "Journal title is required." },
         { status: 400 }
       );
     }
 
-    const volNum = parseInt(volume, 10);
-    const issueNum = parseInt(issue, 10);
+    const volNum = volume !== undefined ? Math.max(1, parseInt(volume, 10) || 1) : 1;
+    const issueNum = issue !== undefined ? Math.max(1, parseInt(issue, 10) || 1) : 1;
 
-    if (isNaN(volNum) || isNaN(issueNum) || volNum < 1 || issueNum < 1) {
-      return NextResponse.json(
-        { error: "Volume and Issue must be positive integers." },
-        { status: 400 }
-      );
-    }
+    // Generate or clean slug
+    let journalSlug = (slug || title)
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
-    // Check if volume/issue already exists
-    const existing = await prisma.journal.findUnique({
-      where: {
-        volume_issue: {
-          volume: volNum,
-          issue: issueNum,
-        },
-      },
+    // Check if slug is taken
+    const existingSlug = await prisma.journal.findFirst({
+      where: { slug: journalSlug },
     });
-
-    if (existing) {
-      return NextResponse.json(
-        { error: `Journal Volume ${volNum}, Issue ${issueNum} already exists.` },
-        { status: 409 }
-      );
+    if (existingSlug) {
+      journalSlug = `${journalSlug}-${Date.now().toString().slice(-4)}`;
     }
 
     const pubDate = publishedAt ? new Date(publishedAt) : new Date();
@@ -79,6 +70,7 @@ export async function POST(req: NextRequest) {
     const journal = await prisma.journal.create({
       data: {
         title: title.trim(),
+        slug: journalSlug,
         description: description?.trim() || null,
         volume: volNum,
         issue: issueNum,

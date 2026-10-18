@@ -58,7 +58,16 @@ export function Header() {
             <Link href="/" className={`${styles.navLink} ${isActive("/") ? styles.navLinkActive : ""}`}>Home</Link>
           </li>
           <li>
-            <Link href="/journals" className={`${styles.navLink} ${isActive("/journals") ? styles.navLinkActive : ""}`}>Journals</Link>
+            <Link
+              href="/content"
+              className={`${styles.navLink} ${
+                isActive("/content") || isActive("/journals") || isActive("/shaoor")
+                  ? styles.navLinkActive
+                  : ""
+              }`}
+            >
+              Content
+            </Link>
           </li>
           <li>
             <Link href="/papers" className={`${styles.navLink} ${isActive("/papers") ? styles.navLinkActive : ""}`}>Papers</Link>
@@ -74,9 +83,6 @@ export function Header() {
           </li>
           <li>
             <Link href="/faq" className={`${styles.navLink} ${isActive("/faq") ? styles.navLinkActive : ""}`}>FAQ</Link>
-          </li>
-          <li>
-            <Link href="/submit" className={`${styles.navLink} ${isActive("/submit") ? styles.navLinkActive : ""}`}>Submit</Link>
           </li>
         </ul>
 
@@ -148,14 +154,13 @@ export function Header() {
       <div className={`${styles.mobileMenu} ${mobileMenuOpen ? styles.open : ""}`}>
         <ul className={styles.mobileNavLinks}>
           <li><Link href="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
-          <li><Link href="/journals" onClick={() => setMobileMenuOpen(false)}>Journals</Link></li>
+          <li><Link href="/content" onClick={() => setMobileMenuOpen(false)}>Content</Link></li>
           <li><Link href="/papers" onClick={() => setMobileMenuOpen(false)}>Papers</Link></li>
           <li><Link href="/about" onClick={() => setMobileMenuOpen(false)}>About</Link></li>
           <li><Link href="/guidelines" onClick={() => setMobileMenuOpen(false)}>Guidelines</Link></li>
           <li><Link href="/team" onClick={() => setMobileMenuOpen(false)}>Our Team</Link></li>
           <li><Link href="/faq" onClick={() => setMobileMenuOpen(false)}>FAQ</Link></li>
           <li><Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link></li>
-          <li><Link href="/submit" onClick={() => setMobileMenuOpen(false)}>Submit a Paper</Link></li>
           {isLoggedIn ? (
             <li style={{ marginTop: "12px", display: "flex", flexDirection: "column", gap: "8px" }}>
               <Link

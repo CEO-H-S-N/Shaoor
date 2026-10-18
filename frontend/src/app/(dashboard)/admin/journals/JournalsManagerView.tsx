@@ -15,12 +15,15 @@ import {
   CheckCircle,
   X,
   Sparkles,
+  Settings,
+  Globe,
 } from "lucide-react";
 import styles from "./journals.module.css";
 
 export interface JournalItem {
   id: string;
   title: string;
+  slug: string | null;
   description: string | null;
   volume: number;
   issue: number;
@@ -40,6 +43,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
 
   // Form State
   const [title, setTitle] = useState("Shaoor Journal of Multidisciplinary Sciences");
+  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [volume, setVolume] = useState<number>(1);
   const [issue, setIssue] = useState<number>(1);
@@ -48,7 +52,8 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
 
   const openCreateModal = () => {
     setEditingId(null);
-    setTitle("Shaoor Journal of Multidisciplinary Sciences");
+    setTitle("Shaoor Journal of ");
+    setSlug("");
     setDescription("");
     // Autoincrement issue if journals exist
     const latestIssue = journals.length > 0 ? Math.max(...journals.map((j) => j.issue)) + 1 : 1;
@@ -63,6 +68,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
   const openEditModal = (j: JournalItem) => {
     setEditingId(j.id);
     setTitle(j.title);
+    setSlug(j.slug || "");
     setDescription(j.description || "");
     setVolume(j.volume);
     setIssue(j.issue);
@@ -86,6 +92,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
+          slug,
           description,
           volume,
           issue,
@@ -104,6 +111,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
               ? {
                   ...item,
                   title,
+                  slug: data.journal.slug || slug,
                   description,
                   volume,
                   issue,
@@ -113,11 +121,12 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
               : item
           )
         );
-        setSuccess("Journal issue updated successfully!");
+        setSuccess("Journal updated successfully!");
       } else {
         const newJournal: JournalItem = {
           id: data.journal.id,
           title: data.journal.title,
+          slug: data.journal.slug,
           description: data.journal.description,
           volume: data.journal.volume,
           issue: data.journal.issue,
@@ -127,7 +136,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
           papersCount: 0,
         };
         setJournals([newJournal, ...journals]);
-        setSuccess(`Volume ${volume}, Issue ${issue} created successfully!`);
+        setSuccess(`Journal "${title}" created successfully!`);
       }
 
       setIsModalOpen(false);
@@ -139,8 +148,8 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
     }
   };
 
-  const handleDelete = async (journalId: string, vol: number, iss: number) => {
-    if (!confirm(`Are you sure you want to delete Volume ${vol}, Issue ${iss}? This action cannot be undone.`)) {
+  const handleDelete = async (journalId: string, journalTitle: string) => {
+    if (!confirm(`Are you sure you want to delete "${journalTitle}"? Any paper associations will be unlinked. This action cannot be undone.`)) {
       return;
     }
 
@@ -153,7 +162,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
       if (!res.ok) throw new Error(data.error || "Failed to delete journal");
 
       setJournals((prev) => prev.filter((j) => j.id !== journalId));
-      setSuccess(`Volume ${vol}, Issue ${iss} removed.`);
+      setSuccess(`Journal "${journalTitle}" removed.`);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err: any) {
       alert(err.message || "Failed to delete journal");
@@ -169,15 +178,18 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
             <ArrowLeft size={14} /> Back to Dashboard
           </Link>
           <span className={styles.separator}>/</span>
-          <span className={styles.currentCrumb}>Manage Journals</span>
+          <span className={styles.currentCrumb}>Manage Journals &amp; Categorization</span>
         </div>
 
         <div className={styles.topActions}>
-          <Link href="/journals" target="_blank" className={styles.publicLink}>
-            <ExternalLink size={14} /> View Public Journals
+          <Link href="/admin/edit-journals" className={styles.publicLink}>
+            <Settings size={14} /> Edit Content Page Text
+          </Link>
+          <Link href="/content" target="_blank" className={styles.publicLink}>
+            <Globe size={14} /> View Live Directory
           </Link>
           <button type="button" className={styles.createBtn} onClick={openCreateModal}>
-            <Plus size={15} /> Create Issue
+            <Plus size={15} /> Add New Journal
           </button>
         </div>
       </div>
@@ -186,11 +198,11 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
       <div className={styles.header}>
         <div className={styles.badge}>
           <BookOpen size={13} />
-          Academic Journal Registry
+          Academic Journal Directory Manager
         </div>
-        <h1 className={styles.title}>Journal Volumes &amp; Issues</h1>
+        <h1 className={styles.title}>Journals &amp; Paper Categorization</h1>
         <p className={styles.subtitle}>
-          Publish and catalog scientific papers into structured academic journal volumes and issues. Only the master admin can create issues and assign manuscripts.
+          Create and manage academic journals on Shaoor, categorize and assign manuscripts into journals, and configure URLs for <code>/shaoor/[journal-name]</code>.
         </p>
       </div>
 
@@ -201,75 +213,95 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
       {journals.length === 0 ? (
         <div className={styles.emptyState}>
           <BookOpen size={48} className={styles.emptyIcon} />
-          <h3>No Journal Issues Yet</h3>
-          <p>Create Volume 1, Issue 1 to begin compiling approved academic papers into official publications.</p>
+          <h3>No Journals in Database</h3>
+          <p>Create your inaugural academic journal to begin compiling and categorizing accepted papers.</p>
           <button type="button" className={styles.createBtn} onClick={openCreateModal} style={{ margin: "16px auto 0 auto" }}>
-            <Plus size={15} /> Create First Issue
+            <Plus size={15} /> Add First Journal
           </button>
         </div>
       ) : (
         <div className={styles.journalGrid}>
-          {journals.map((journal) => (
-            <div key={journal.id} className={styles.journalCard}>
-              <div className={styles.cardHeader}>
-                <div className={styles.volBadge}>
-                  <Layers size={13} /> Vol. {journal.volume} · Iss. {journal.issue}
+          {journals.map((journal) => {
+            const publicUrl = `/shaoor/${encodeURIComponent(journal.slug || journal.id)}`;
+
+            return (
+              <div key={journal.id} className={styles.journalCard}>
+                <div className={styles.cardHeader}>
+                  <div className={styles.volBadge}>
+                    <Layers size={13} /> Vol. {journal.volume} · Iss. {journal.issue}
+                  </div>
+                  <div className={styles.statusBadge}>
+                    {journal.isActive ? (
+                      <span className={styles.badgeActive}>Active / Live</span>
+                    ) : (
+                      <span className={styles.badgeArchived}>Draft / Hidden</span>
+                    )}
+                  </div>
                 </div>
-                <div className={styles.statusBadge}>
-                  {journal.isActive ? (
-                    <span className={styles.badgeActive}>Active / Live</span>
-                  ) : (
-                    <span className={styles.badgeArchived}>Draft / Hidden</span>
-                  )}
+
+                <h2 className={styles.cardTitle}>{journal.title}</h2>
+                {journal.description && (
+                  <p className={styles.cardDesc}>{journal.description}</p>
+                )}
+
+                <div className={styles.cardMeta}>
+                  <span>
+                    <Calendar size={13} />
+                    {new Date(journal.publishedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <span>
+                    <FileText size={13} />
+                    {journal.papersCount} Categorized Paper{journal.papersCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                {journal.slug && (
+                  <div style={{ fontSize: "0.75rem", color: "#64748b", margin: "6px 0 10px" }}>
+                    URL: <code>/shaoor/{journal.slug}</code>
+                  </div>
+                )}
+
+                <div className={styles.cardActions}>
+                  <Link
+                    href={`/admin/journals/${journal.id}`}
+                    className={styles.managePapersBtn}
+                    title="Assign, reorder, or remove papers in this journal"
+                  >
+                    <Sparkles size={13} /> Categorize Papers ({journal.papersCount})
+                  </Link>
+                  <a
+                    href={publicUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.iconBtn}
+                    title="View live journal page on Shaoor"
+                  >
+                    <ExternalLink size={14} />
+                  </a>
+                  <button
+                    type="button"
+                    className={styles.iconBtn}
+                    onClick={() => openEditModal(journal)}
+                    title="Edit Journal Name & Settings"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className={`${styles.iconBtn} ${styles.deleteBtn}`}
+                    onClick={() => handleDelete(journal.id, journal.title)}
+                    title="Delete Journal"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
-
-              <h2 className={styles.cardTitle}>{journal.title}</h2>
-              {journal.description && (
-                <p className={styles.cardDesc}>{journal.description}</p>
-              )}
-
-              <div className={styles.cardMeta}>
-                <span>
-                  <Calendar size={13} />
-                  {new Date(journal.publishedAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                </span>
-                <span>
-                  <FileText size={13} />
-                  {journal.papersCount} Paper{journal.papersCount !== 1 ? "s" : ""}
-                </span>
-              </div>
-
-              <div className={styles.cardActions}>
-                <Link
-                  href={`/admin/journals/${journal.id}`}
-                  className={styles.managePapersBtn}
-                >
-                  <Sparkles size={13} /> Manage Papers ({journal.papersCount})
-                </Link>
-                <button
-                  type="button"
-                  className={styles.iconBtn}
-                  onClick={() => openEditModal(journal)}
-                  title="Edit Journal Metadata"
-                >
-                  <Edit2 size={14} />
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.iconBtn} ${styles.deleteBtn}`}
-                  onClick={() => handleDelete(journal.id, journal.volume, journal.issue)}
-                  title="Delete Journal Issue"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -278,7 +310,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
         <div className={styles.modalOverlay} onClick={() => setIsModalOpen(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3>{editingId ? "Edit Journal Issue" : "Create New Journal Issue"}</h3>
+              <h3>{editingId ? "Edit Journal Details" : "Create New Academic Journal"}</h3>
               <button
                 type="button"
                 className={styles.closeBtn}
@@ -292,13 +324,25 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
               {error && <div className={styles.modalError}>{error}</div>}
 
               <div className={styles.formGroup}>
-                <label htmlFor="j-title">Journal Series Title</label>
+                <label htmlFor="j-title">Journal Name / Title</label>
                 <input
                   id="j-title"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
+                  placeholder="e.g. Shaoor Journal of Health & Medical Sciences"
                   required
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="j-slug">URL Slug (Accessible at /shaoor/[slug])</label>
+                <input
+                  id="j-slug"
+                  type="text"
+                  value={slug}
+                  onChange={(e) => setSlug(e.target.value)}
+                  placeholder="e.g. health-medical-sciences (auto-generated if empty)"
                 />
               </div>
 
@@ -339,13 +383,13 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="j-desc">Editorial Description / Focus Area</label>
+                <label htmlFor="j-desc">Journal Scope &amp; Editorial Description</label>
                 <textarea
                   id="j-desc"
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Themed issues, editorial notes, or special multidisciplinary focus..."
+                  placeholder="Focus areas, disciplinary scope, research topics..."
                 />
               </div>
 
@@ -356,7 +400,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                     checked={isActive}
                     onChange={(e) => setIsActive(e.target.checked)}
                   />
-                  <span>Active &amp; Visible on Public Journals Page</span>
+                  <span>Active &amp; Visible on Public Content Directory</span>
                 </label>
               </div>
 
@@ -374,7 +418,7 @@ export function JournalsManagerView({ initialJournals }: { initialJournals: Jour
                   className={styles.submitBtn}
                   disabled={submitting}
                 >
-                  {submitting ? "Saving..." : editingId ? "Update Issue" : "Create Issue"}
+                  {submitting ? "Saving..." : editingId ? "Update Journal" : "Create Journal"}
                 </button>
               </div>
             </form>

@@ -31,8 +31,8 @@ export function Footer() {
           <div className={styles.footerColumn}>
             <h4>Platform</h4>
             <ul className={styles.footerLinks}>
+              <li><Link href="/content">Journal Content</Link></li>
               <li><Link href="/papers">Browse Papers</Link></li>
-              <li><Link href="/submit">Submit a Paper</Link></li>
               <li><Link href="/about">About Shaoor</Link></li>
               <li><Link href="/guidelines">Author Guidelines</Link></li>
               <li><Link href="/team">Our Team &amp; Editorial Board</Link></li>

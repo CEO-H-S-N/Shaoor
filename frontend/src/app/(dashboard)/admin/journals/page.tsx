@@ -33,6 +33,7 @@ export default async function AdminJournalsPage() {
   const journals = rawJournals.map((j) => ({
     id: j.id,
     title: j.title,
+    slug: j.slug,
     description: j.description,
     volume: j.volume,
     issue: j.issue,

@@ -43,6 +43,7 @@ interface JournalDetailProps {
   journal: {
     id: string;
     title: string;
+    slug?: string | null;
     volume: number;
     issue: number;
     description: string | null;
@@ -177,11 +178,11 @@ export function JournalDetailEditorView({
 
         <div className={styles.topActions}>
           <Link
-            href={`/journals/${journal.id}`}
+            href={`/shaoor/${journal.slug || journal.id}`}
             target="_blank"
             className={styles.publicLink}
           >
-            <ExternalLink size={14} /> Public Issue View
+            <ExternalLink size={14} /> View Live Journal (/shaoor)
           </Link>
           <button
             type="button"

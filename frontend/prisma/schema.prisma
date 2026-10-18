@@ -341,6 +341,7 @@ model Announcement {
 model Journal {
   id          String   @id @default(cuid())
   title       String
+  slug        String?  @unique
   description String?  @db.Text
   volume      Int
   issue       Int
@@ -353,7 +354,7 @@ model Journal {
 
   entries JournalEntry[]
 
-  @@unique([volume, issue])
+  @@index([volume, issue])
   @@index([isActive])
   @@map("journals")
 }

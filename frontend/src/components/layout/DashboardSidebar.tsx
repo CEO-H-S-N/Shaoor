@@ -34,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/manage/create-admin", label: "Make Admin Account", icon: UserPlus, roles: ["ADMIN", "DESIGNER"] },
   { href: "/manage/users", label: "Manage Accounts", icon: Users, roles: ["ADMIN", "DESIGNER"] },
   { href: "/admin/journals", label: "Manage Journals", icon: BookOpen, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
+  { href: "/admin/papers", label: "Manage Papers", icon: FileText, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
   { href: "/admin/edit-journals", label: "Edit Journals Page", icon: BookOpen, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
   { href: "/admin/edit-home", label: "Edit Homepage", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },
   { href: "/admin/edit-about", label: "Edit About Page", icon: FileEdit, roles: ["ADMIN", "DESIGNER"], ownerOnly: true },

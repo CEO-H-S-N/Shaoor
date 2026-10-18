@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shaoor.org — Project Audit and Commercial Invoice</title>
+<style>
+  @page {
+    size: A4;
+    margin: 14mm 14mm 14mm 14mm;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background: #ffffff;
+    font-size: 9pt;
+    line-height: 1.4;
+  }
+
+  /* Header */
+  .header-table {
+    width: 100%;
+    margin-bottom: 16px;
+    border-bottom: 2.5px solid #1e3a8a;
+    padding-bottom: 12px;
+  }
+  .header-table td {
+    vertical-align: top;
+  }
+  .logo-title {
+    font-size: 20pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    letter-spacing: -0.5px;
+  }
+  .logo-sub {
+    font-size: 8.5pt;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .invoice-meta {
+    text-align: right;
+  }
+  .invoice-badge {
+    display: inline-block;
+    background: #1e3a8a;
+    color: #ffffff;
+    font-size: 8pt;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+  }
+  .meta-line {
+    font-size: 8.5pt;
+    color: #475569;
+  }
+  .meta-line strong {
+    color: #0f172a;
+  }
+
+  /* Parties Table */
+  .parties-table {
+    width: 100%;
+    margin-bottom: 14px;
+  }
+  .parties-table td {
+    width: 50%;
+    vertical-align: top;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+  }
+  .parties-table td:first-child {
+    border-right: 5px solid #ffffff;
+  }
+  .party-title {
+    font-size: 7.5pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 3px;
+  }
+  .party-name {
+    font-size: 9.5pt;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+  .party-desc {
+    font-size: 8.2pt;
+    color: #475569;
+    line-height: 1.35;
+  }
+
+  /* Technical Audit Banner */
+  .audit-section {
+    margin-bottom: 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .audit-header {
+    font-size: 8.8pt;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .metrics-table {
+    width: 100%;
+  }
+  .metrics-table td {
+    text-align: center;
+    padding: 5px 3px;
+    background: #ffffff;
+    border-radius: 4px;
+    border: 1px solid #dbeafe;
+    width: 20%;
+  }
+  .metric-val {
+    font-size: 11pt;
+    font-weight: 800;
+    color: #1e3a8a;
+  }
+  .metric-lbl {
+    font-size: 6.8pt;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+  }
+
+  /* Items Table */
+  .items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .items-table th {
+    background: #1e3a8a;
+    color: #ffffff;
+    font-size: 7.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 7px 9px;
+    text-align: left;
+  }
+  .items-table th:last-child,
+  .items-table td:last-child,
+  .items-table th:nth-child(2),
+  .items-table td:nth-child(2),
+  .items-table th:nth-child(3),
+  .items-table td:nth-child(3) {
+    text-align: right;
+  }
+  .items-table td {
+    padding: 6px 9px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 8.2pt;
+    vertical-align: middle;
+  }
+  .items-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+  .item-title {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 1px;
+    font-size: 8.5pt;
+  }
+  .item-desc {
+    font-size: 7.2pt;
+    color: #64748b;
+    line-height: 1.25;
+  }
+
+  /* Totals */
+  .totals-table {
+    width: 48%;
+    margin-left: auto;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+  }
+  .totals-table td {
+    padding: 4px 6px;
+    font-size: 8.2pt;
+  }
+  .totals-table td:last-child {
+    text-align: right;
+    font-weight: 600;
+  }
+  .totals-table .discount-row td {
+    color: #166534;
+  }
+  .totals-table .grand-total td {
+    border-top: 2px solid #1e3a8a;
+    border-bottom: 2px solid #1e3a8a;
+    font-size: 10.5pt;
+    font-weight: 800;
+    color: #1e3a8a;
+    padding: 6px 6px;
+  }
+
+  /* Currency Pill */
+  .currency-box {
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 7px 10px;
+    margin-bottom: 12px;
+    font-size: 7.6pt;
+    color: #334155;
+    line-height: 1.35;
+  }
+
+  /* Terms and Signatures */
+  .terms-section {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+    font-size: 7.5pt;
+    color: #64748b;
+    line-height: 1.35;
+  }
+  .terms-heading {
+    font-weight: 700;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+    font-size: 7.8pt;
+  }
+  .signature-table {
+    width: 100%;
+    margin-top: 10px;
+  }
+  .signature-table td {
+    width: 50%;
+    vertical-align: top;
+  }
+  .sig-line {
+    border-top: 1px solid #94a3b8;
+    width: 82%;
+    margin-top: 18px;
+    padding-top: 3px;
+    font-size: 7.2pt;
+    color: #64748b;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Header -->
+  <table class="header-table">
+    <tr>
+      <td>
+        <div class="logo-title">SHAOOR.ORG</div>
+        <div class="logo-sub">Enterprise Academic Publishing &amp; Peer-Review Platform</div>
+      </td>
+      <td class="invoice-meta">
+        <div class="invoice-badge">OFFICIAL TAX INVOICE &amp; AUDIT</div>
+        <div class="meta-line">Invoice Ref: <strong>INV-2026-SHR-001</strong></div>
+        <div class="meta-line">Issue Date: <strong>12 October 2026</strong></div>
+        <div class="meta-line">Payment Terms: <strong>Milestone / Net 15</strong></div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Parties -->
+  <table class="parties-table">
+    <tr>
+      <td>
+        <div class="party-title">Billed To (Client):</div>
+        <div class="party-name">Dr. Shoukat Tilwani</div>
+        <div class="party-desc">
+          Editor-in-Chief &amp; Platform Directorate<br>
+          Shaoor Journal of Multidisciplinary Sciences<br>
+          Direct Contact: <strong>shouket.tilwani@gmail.com</strong>
+        </div>
+      </td>
+      <td>
+        <div class="party-title">Provider / Development Lead:</div>
+        <div class="party-name">HSN Software Engineering &amp; Architecture</div>
+        <div class="party-desc">
+          Full-Stack Web &amp; Cloud Infrastructure Practice<br>
+          Contractor / Lead Software Architect<br>
+          Project: Shaoor.org Core Infrastructure &amp; CMS
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Project Audit Summary -->
+  <div class="audit-section">
+    <div class="audit-header">
+      <span>Comprehensive Technical Audit &amp; Architecture Scope</span>
+      <span style="font-size: 7.5pt; color: #475569;">Production-Ready (Next.js 15 + PostgreSQL RDS)</span>
+    </div>
+    <table class="metrics-table">
+      <tr>
+        <td>
+          <div class="metric-val">36,469</div>
+          <div class="metric-lbl">Clean Code Lines</div>
+        </td>
+        <td>
+          <div class="metric-val">165</div>
+          <div class="metric-lbl">Handcrafted Files</div>
+        </td>
+        <td>
+          <div class="metric-val">65</div>
+          <div class="metric-lbl">Routes &amp; Pages</div>
+        </td>
+        <td>
+          <div class="metric-val">13</div>
+          <div class="metric-lbl">DB Relational Models</div>
+        </td>
+        <td>
+          <div class="metric-val">10/10</div>
+          <div class="metric-lbl">OWASP Hardening</div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- Itemized Cost Breakdown -->
+  <table class="items-table">
+    <thead>
+      <tr>
+        <th style="width: 60%;">Deliverable &amp; Engineering Scope</th>
+        <th style="width: 12%;">Effort</th>
+        <th style="width: 13%;">Rate</th>
+        <th style="width: 15%;">Amount (USD)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <div class="item-title">1. Cloud Infrastructure, RDS PostgreSQL &amp; Persistent Pooling</div>
+          <div class="item-desc">AWS RDS PostgreSQL setup, persistent pg.Pool adapter eliminating SSL handshake latency, AWS S3 AES-256 encrypted storage, pre-signed upload pipelines.</div>
+        </td>
+        <td>32 hrs</td>
+        <td>$50.00</td>
+        <td>$1,600.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">2. Academic Manuscript Submission Portal &amp; High-Res Figures Studio</div>
+          <div class="item-desc">5-stage submission wizard (/submit), pre-flight readiness checklist, multi-format 300+ DPI scientific figures management, metadata indexing.</div>
+        </td>
+        <td>42 hrs</td>
+        <td>$50.00</td>
+        <td>$2,100.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">3. Double-Blind Peer Review Queue &amp; Reviewer Delegation Engine</div>
+          <div class="item-desc">Role-scoped reviewer queue (/review), Master Admin paper delegation (/api/admin/papers/[id]/assign), bcrypt multi-factor password verification for approvals and deletions.</div>
+        </td>
+        <td>38 hrs</td>
+        <td>$50.00</td>
+        <td>$1,900.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">4. Academic Journals Publishing Suite &amp; Issue Management Engine</div>
+          <div class="item-desc">Journal volume and issue compiler (/admin/journals), pagination, Table of Contents, 1-click PDF download, public archives (/journals and /journals/[id]).</div>
+        </td>
+        <td>34 hrs</td>
+        <td>$50.00</td>
+        <td>$1,700.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">5. Bespoke 7-Module CMS Suite (Exclusively Master Admin)</div>
+          <div class="item-desc">Dedicated live visual editors for Homepage (/admin/edit-home), Journals (/admin/edit-journals), About (/admin/edit-about), Guidelines (/admin/edit-guidelines), Team (/admin/edit-team), Announcements (/admin/edit-announcement), and FAQ (/admin/edit-faq).</div>
+        </td>
+        <td>46 hrs</td>
+        <td>$50.00</td>
+        <td>$2,300.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">6. Master Admin Platform Governance &amp; User Lifecycle Management</div>
+          <div class="item-desc">Administrator account creation portal (/manage/create-admin), certified credentials dispatch, temporary ban / suspension toggles, cascade safe account deletion.</div>
+        </td>
+        <td>26 hrs</td>
+        <td>$50.00</td>
+        <td>$1,300.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">7. Live Activity Notifications, Revolving Carousels &amp; Analytics Engine</div>
+          <div class="item-desc">Universal real-time notification bell with unread tracking, dual stepped revolving paper carousels with rAF opacity fading, deduplicated views &amp; atomic download tracker, APA citation export.</div>
+        </td>
+        <td>28 hrs</td>
+        <td>$50.00</td>
+        <td>$1,400.00</td>
+      </tr>
+      <tr>
+        <td>
+          <div class="item-title">8. OWASP Top 10 Security Hardening, Edge Middleware &amp; Audit Logging</div>
+          <div class="item-desc">Edge auth guard (proxy.ts), CSP headers, bot/crawler defense, rate limiting, timing-safe bcrypt comparisons, fire-and-forget structured audit logging.</div>
+        </td>
+        <td>22 hrs</td>
+        <td>$50.00</td>
+        <td>$1,100.00</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Financial Totals -->
+  <table class="totals-table">
+    <tr>
+      <td>Gross Development Effort (268 Billable Hours):</td>
+      <td>$13,400.00</td>
+    </tr>
+    <tr class="discount-row">
+      <td>Academic Publishing Concession / Introductory Discount (15%):</td>
+      <td>-$2,010.00</td>
+    </tr>
+    <tr class="grand-total">
+      <td>Net Total Due:</td>
+      <td>$11,390.00 USD</td>
+    </tr>
+  </table>
+
+  <!-- Currency Conversion -->
+  <div class="currency-box">
+    <strong>International Currency Conversions (at benchmark forex rates):</strong><br>
+    &bull; <strong>Saudi Riyal (SAR):</strong> ~42,750 SAR (at 1 USD = 3.75 SAR)<br>
+    &bull; <strong>Pakistani Rupee (PKR):</strong> ~3,180,000 PKR (at 1 USD = 279 PKR)<br>
+    &bull; <strong>United Arab Emirates Dirham (AED):</strong> ~41,800 AED (at 1 USD = 3.67 AED)
+  </div>
+
+  <!-- Terms & Signature -->
+  <div class="terms-section">
+    <div class="terms-heading">Payment Schedule &amp; Commercial Terms</div>
+    <p>
+      <strong>Milestone 1 (Mobilization &amp; Architecture):</strong> 35% ($3,986.50 USD) &bull; 
+      <strong>Milestone 2 (Submission, Peer Review &amp; Journals Alpha):</strong> 35% ($3,986.50 USD) &bull; 
+      <strong>Milestone 3 (Final Deployment, CMS &amp; Handover):</strong> 30% ($3,417.00 USD).<br>
+      <strong>Ongoing Retainer (Optional):</strong> Comprehensive monthly server maintenance, automated daily backups, security monitoring, and minor feature updates available at <strong>$450.00 USD / month</strong>.
+    </p>
+
+    <table class="signature-table">
+      <tr>
+        <td>
+          <div class="sig-line">Prepared &amp; Certified by: <strong>HSN Solutions (Lead Architect)</strong></div>
+        </td>
+        <td>
+          <div class="sig-line">Accepted &amp; Approved by: <strong>Dr. Shoukat Tilwani (Platform Owner)</strong></div>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+</body>
+</html>
