@@ -7,13 +7,11 @@ import { prisma } from "@/lib/prisma";
 import {
   BookOpen,
   Layers,
-  Calendar,
   FileText,
   ArrowRight,
   Settings,
   ShieldCheck,
-  Sparkles,
-  ExternalLink,
+  CheckCircle2,
 } from "lucide-react";
 import { DEFAULT_JOURNALS_PAGE_CONTENT as DEFAULT_CMS } from "@/lib/pageContentDefaults";
 import styles from "./content.module.css";
@@ -93,7 +91,7 @@ export default async function ContentJournalsPage() {
       <Header />
 
       <main>
-        {/* ── Hero Section ───────────────────────────────────── */}
+        {/* ── Minimalist & Subtle Header (No heavy blue banner) ── */}
         <section className={styles.hero}>
           <div className={styles.heroInner}>
             <div className={styles.badge}>
@@ -124,18 +122,18 @@ export default async function ContentJournalsPage() {
               <div className={styles.ownerBar}>
                 <Link href="/admin/edit-journals" className={styles.adminEditBadge}>
                   <Settings size={13} />
-                  Edit Content Page Text (Platform Owner)
+                  Edit Page Text (Platform Owner)
                 </Link>
                 <Link href="/admin/journals" className={styles.adminEditBadge}>
                   <Settings size={13} />
-                  Manage Journals &amp; Categorize Papers (Platform Owner)
+                  Manage Journals &amp; Papers (Platform Owner)
                 </Link>
               </div>
             )}
           </div>
         </section>
 
-        {/* ── Journals Directory Grid ─────────────────────────── */}
+        {/* ── List View Container ─────────────────────────────── */}
         <div className={styles.container}>
           <div className={styles.sectionHeader}>
             <div>
@@ -146,30 +144,34 @@ export default async function ContentJournalsPage() {
 
           {rawJournals.length === 0 ? (
             <div className={styles.emptyState}>
-              <BookOpen size={48} className={styles.emptyIcon} />
+              <BookOpen size={42} className={styles.emptyIcon} />
               <h3>{cms.emptyStateTitle}</h3>
               <p>{cms.emptyStateMessage}</p>
             </div>
           ) : (
-            <div className={styles.journalsGrid}>
+            <div className={styles.journalsList}>
               {rawJournals.map((journal) => {
                 const journalHref = `/shaoor/${encodeURIComponent(journal.slug || journal.id)}`;
                 const paperCount = journal._count.entries;
 
                 return (
-                  <div key={journal.id} className={styles.journalCard}>
-                    <div className={styles.cardBanner}>
-                      <div className={styles.volumeTag}>
-                        <Layers size={13} />
-                        Vol. {journal.volume} · Issue {journal.issue}
+                  <article key={journal.id} className={styles.journalListItem}>
+                    <div className={styles.journalMainCol}>
+                      <div className={styles.journalMetaRow}>
+                        <span className={styles.volumeTag}>
+                          <Layers size={12} />
+                          Vol. {journal.volume} · Issue {journal.issue}
+                        </span>
+                        <span className={styles.peerBadge}>
+                          <ShieldCheck size={12} />
+                          Peer-Reviewed
+                        </span>
+                        <span className={styles.papersCountTag}>
+                          <FileText size={12} />
+                          {paperCount} {paperCount === 1 ? "Manuscript" : "Manuscripts"}
+                        </span>
                       </div>
-                      <div className={styles.peerBadge}>
-                        <ShieldCheck size={13} />
-                        Peer-Reviewed
-                      </div>
-                    </div>
 
-                    <div className={styles.cardBody}>
                       <h3 className={styles.journalName}>
                         <Link href={journalHref}>{journal.title}</Link>
                       </h3>
@@ -178,12 +180,12 @@ export default async function ContentJournalsPage() {
                         <p className={styles.journalDesc}>{journal.description}</p>
                       )}
 
-                      {/* Preview of papers in this journal */}
+                      {/* Featured Manuscripts Preview */}
                       {journal.entries.length > 0 && (
                         <div className={styles.paperPreviewList}>
                           <div className={styles.paperPreviewHeader}>
                             <FileText size={11} />
-                            Featured Articles ({paperCount} Total)
+                            Featured Articles
                           </div>
                           {journal.entries.map((entry: any) => (
                             <div
@@ -191,21 +193,21 @@ export default async function ContentJournalsPage() {
                               className={styles.paperPreviewItem}
                               title={entry.paper.title}
                             >
-                              <span>•</span>
+                              <span className={styles.paperPreviewDot}>●</span>
                               <span>{entry.paper.title}</span>
                             </div>
                           ))}
                         </div>
                       )}
-
-                      <div className={styles.cardFooter}>
-                        <Link href={journalHref} className={styles.openJournalLink}>
-                          <span>Open Journal &amp; Read Papers</span>
-                          <ArrowRight size={14} />
-                        </Link>
-                      </div>
                     </div>
-                  </div>
+
+                    <div className={styles.journalActionCol}>
+                      <Link href={journalHref} className={styles.openJournalBtn}>
+                        <span>Browse Journal</span>
+                        <ArrowRight size={14} />
+                      </Link>
+                    </div>
+                  </article>
                 );
               })}
             </div>

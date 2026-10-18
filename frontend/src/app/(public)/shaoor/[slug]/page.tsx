@@ -155,7 +155,7 @@ export default async function JournalBySlugPage({ params }: PageProps) {
 
             <div className={styles.metricsRow}>
               <div className={styles.metricItem}>
-                <Calendar size={15} style={{ color: "#93c5fd" }} />
+                <Calendar size={15} style={{ color: "#64748b" }} />
                 <span>
                   Published:{" "}
                   <strong>
@@ -167,13 +167,13 @@ export default async function JournalBySlugPage({ params }: PageProps) {
                 </span>
               </div>
               <div className={styles.metricItem}>
-                <FileText size={15} style={{ color: "#93c5fd" }} />
+                <FileText size={15} style={{ color: "#64748b" }} />
                 <span>
                   Catalogued Articles: <strong>{entries.length}</strong>
                 </span>
               </div>
               <div className={styles.metricItem}>
-                <BookOpen size={15} style={{ color: "#93c5fd" }} />
+                <BookOpen size={15} style={{ color: "#64748b" }} />
                 <span>
                   License: <strong>CC-BY 4.0 International</strong>
                 </span>
