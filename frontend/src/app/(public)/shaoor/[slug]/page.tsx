@@ -246,7 +246,7 @@ export default async function JournalBySlugPage({ params }: PageProps) {
                     </div>
 
                     <h3 className={styles.cardTitle}>
-                      <Link href={`/papers/${paper.id}`}>{paper.title}</Link>
+                      <Link href={`/papers/${paper.id}?from=${encodeURIComponent(`/shaoor/${journal.slug || journal.id}`)}`}>{paper.title}</Link>
                     </h3>
 
                     {paper.abstract && (
@@ -267,7 +267,7 @@ export default async function JournalBySlugPage({ params }: PageProps) {
 
                       <div className={styles.cardActions}>
                         <Link
-                          href={`/papers/${paper.id}`}
+                          href={`/papers/${paper.id}?from=${encodeURIComponent(`/shaoor/${journal.slug || journal.id}`)}`}
                           className={styles.readBtn}
                         >
                           Read Article <ArrowRight size={14} />
