@@ -173,7 +173,7 @@ export default async function ContentJournalsPage() {
                       </div>
 
                       <h3 className={styles.journalName}>
-                        <Link href={journalHref}>{journal.title}</Link>
+                        <Link href={journalHref} target="_blank" rel="noopener noreferrer">{journal.title}</Link>
                       </h3>
 
                       {journal.description && (
@@ -202,7 +202,7 @@ export default async function ContentJournalsPage() {
                     </div>
 
                     <div className={styles.journalActionCol}>
-                      <Link href={journalHref} className={styles.openJournalBtn}>
+                      <Link href={journalHref} className={styles.openJournalBtn} target="_blank" rel="noopener noreferrer">
                         <span>Browse Journal</span>
                         <ArrowRight size={14} />
                       </Link>

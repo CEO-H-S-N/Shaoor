@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { JournalHeader } from "@/components/layout/JournalHeader";
+import { JournalFooter } from "@/components/layout/JournalFooter";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import {
@@ -121,7 +121,7 @@ export default async function JournalBySlugPage({ params }: PageProps) {
 
   return (
     <div className={styles.page}>
-      <Header />
+      <JournalHeader />
 
       <main>
         {/* ── Hero Section ───────────────────────────────────── */}
@@ -295,7 +295,7 @@ export default async function JournalBySlugPage({ params }: PageProps) {
         </div>
       </main>
 
-      <Footer />
+      <JournalFooter />
     </div>
   );
 }

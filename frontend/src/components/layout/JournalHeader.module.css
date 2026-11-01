@@ -1,0 +1,361 @@
+/* ═══════════════════════════════════════════════════════════════
+   JournalHeader — minimal, focused header for journal detail pages
+   Logo | ← All Journals | Journal View label | Account controls
+   ═══════════════════════════════════════════════════════════════ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: #ffffff;
+  border-bottom: 2px solid #1e3a8a;
+  box-shadow: 0 1px 4px rgba(30, 58, 138, 0.08);
+}
+
+/* ─── Main Nav ─────────────────────────────────────────────── */
+.mainNav {
+  display: flex;
+  align-items: center;
+  height: var(--header-height, 64px);
+  width: 100%;
+  padding: 0 28px;
+  gap: 16px;
+}
+
+/* ─── Logo ─────────────────────────────────────────────────── */
+.logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logoImage {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.15s ease;
+}
+
+.logo:hover .logoImage {
+  transform: scale(1.04);
+}
+
+/* ─── Back link ────────────────────────────────────────────── */
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 12px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.backLink:hover {
+  background: #dbeafe;
+  border-color: #93c5fd;
+  text-decoration: none;
+}
+
+/* ─── Divider & label ──────────────────────────────────────── */
+.divider {
+  width: 1px;
+  height: 22px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+.journalLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+/* ─── Auth Area ────────────────────────────────────────────── */
+.authArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.authGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Sign in button (unauthenticated) */
+.signInBtn {
+  padding: 7px 16px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  border: 1.5px solid #1e3a8a;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.signInBtn:hover {
+  background: #eff6ff;
+  text-decoration: none;
+}
+
+/* Dashboard link */
+.dashboardLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: #1e3a8a;
+  color: #ffffff !important;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.dashboardLink:hover {
+  background: #1d4ed8;
+  text-decoration: none;
+}
+
+/* User badge */
+.userBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  background: #f8faff;
+  border-radius: 4px;
+  border: 1px solid #dbeafe;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.userBadge:hover {
+  background: #eff6ff;
+  border-color: #93c5fd;
+  text-decoration: none;
+}
+
+.userAvatarImg {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #bfdbfe;
+}
+
+.userInitial {
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  background: #1e3a8a;
+  color: white;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.userName {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #1e293b;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userRoleBadge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-radius: 2px;
+}
+
+/* Logout button */
+.logoutBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: transparent;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 4px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.logoutBtn:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+}
+
+/* ─── Mobile toggle ────────────────────────────────────────── */
+.mobileMenuBtn {
+  display: none;
+  padding: 6px;
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #1e3a8a;
+}
+
+.mobileMenuBtn:hover {
+  background: #eff6ff;
+}
+
+/* ─── Mobile menu ──────────────────────────────────────────── */
+.mobileMenu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid #dbeafe;
+  border-bottom: 2px solid #1e3a8a;
+  padding: 16px 20px 20px;
+  box-shadow: 0 8px 24px rgba(30, 58, 138, 0.1);
+}
+
+.mobileMenu.open {
+  display: block;
+}
+
+.mobileNavLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mobileNavLinks a,
+.mobileNavLinks button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.mobileNavLinks a:hover,
+.mobileNavLinks button:hover {
+  background: #eff6ff;
+  color: #1e3a8a;
+  text-decoration: none;
+}
+
+.mobileDashLink {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  justify-content: center;
+  border-radius: 4px;
+  font-weight: 600 !important;
+}
+
+.mobileDashLink:hover {
+  background: #1d4ed8 !important;
+}
+
+.mobileSettingsLink {
+  background: #eff6ff !important;
+  color: #1e3a8a !important;
+  border: 1px solid #bfdbfe;
+  justify-content: center;
+  font-weight: 600 !important;
+}
+
+.mobileLogoutBtn {
+  color: #dc2626 !important;
+  border: 1px solid #fecaca !important;
+  justify-content: center;
+}
+
+.mobileLogoutBtn:hover {
+  background: #fef2f2 !important;
+}
+
+.mobileSignInBtn {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  justify-content: center;
+  font-weight: 600 !important;
+}
+
+/* ─── Responsive ───────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .backLink,
+  .divider,
+  .journalLabel,
+  .authGroup {
+    display: none;
+  }
+
+  .mobileMenuBtn {
+    display: flex;
+  }
+
+  .mainNav {
+    height: 60px;
+    padding: 0 16px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .journalLabel {
+    display: none;
+  }
+
+  .userName {
+    display: none;
+  }
+
+  .userRoleBadge {
+    display: none;
+  }
+}

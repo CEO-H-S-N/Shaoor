@@ -1,0 +1,90 @@
+/* ═══════════════════════════════════════════════════════════════
+   JournalFooter — slim, focused footer for journal detail pages
+   ═══════════════════════════════════════════════════════════════ */
+
+.footer {
+  background: #0f172a;
+  color: #94a3b8;
+  padding: 36px 0 28px;
+  margin-top: auto;
+}
+
+.inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+/* Brand row */
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoImg {
+  height: 34px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+}
+
+.tagline {
+  font-size: 0.75rem;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}
+
+/* Nav links */
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 20px;
+}
+
+.links a {
+  font-size: 0.8125rem;
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.links a:hover {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+/* Copyright */
+.copy {
+  font-size: 0.75rem;
+  color: #475569;
+  margin: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 16px;
+  width: 100%;
+  text-align: center;
+}
+
+.credit {
+  color: #93c5fd;
+  font-weight: 500;
+}
+
+@media (max-width: 767px) {
+  .inner {
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .links {
+    gap: 8px 16px;
+  }
+}

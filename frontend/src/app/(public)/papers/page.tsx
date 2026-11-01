@@ -467,6 +467,8 @@ export default async function PapersPage({ searchParams }: PageProps) {
                                 href={`/shaoor/${encodeURIComponent(assignedJournal.slug || assignedJournal.id)}`}
                                 className={styles.journalBadgeLink}
                                 title={`View published journal: ${assignedJournal.title}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
                               >
                                 <BookOpen size={11} />
                                 <span>
