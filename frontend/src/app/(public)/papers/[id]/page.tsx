@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PaperActions, CopyCitationButton } from "./PaperActions";
+import { BackButton, SmartBreadcrumb } from "./BackButton";
 import { EditorialTopBanner, EditorialBottomSection } from "./EditorialDecisionSection";
 import styles from "./page.module.css";
 
@@ -199,23 +200,10 @@ export default async function PaperDetailPage({ params }: Props) {
   return (
     <div className={styles.page}>
       {/* ── Breadcrumb ──────────────────────────────────────── */}
-      <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-        <Link href="/">Home</Link>
-        <span className={styles.breadcrumbSep}>
-          <ChevronRight size={12} />
-        </span>
-        <Link href="/papers">Papers</Link>
-        <span className={styles.breadcrumbSep}>
-          <ChevronRight size={12} />
-        </span>
-        <span style={{ color: "var(--color-neutral-600)" }}>{paper.category}</span>
-      </nav>
+      <SmartBreadcrumb category={paper.category} />
 
       {/* ── Back Button ─────────────────────────────────────── */}
-      <Link href="/papers" className={styles.backBtn} aria-label="Back to Papers">
-        <ArrowLeft size={16} />
-        Back to Papers
-      </Link>
+      <BackButton />
 
       {/* ── Editorial Review Alert Banner (if reviewed) ────── */}
       <EditorialTopBanner

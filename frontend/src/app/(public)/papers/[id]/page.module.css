@@ -46,10 +46,12 @@
   border-radius: var(--radius-full);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
+  font-family: inherit;
   color: var(--color-neutral-700);
   text-decoration: none;
   transition: all var(--transition-fast);
   width: fit-content;
+  cursor: pointer;
 }
 
 .backBtn:hover {
@@ -57,6 +59,7 @@
   color: var(--color-neutral-900);
   text-decoration: none;
 }
+
 
 /* ─── Paper Header ────────────────────────────────────────── */
 .paperHeader {
